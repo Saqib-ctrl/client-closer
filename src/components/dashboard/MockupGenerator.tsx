@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,17 +12,20 @@ import {
   Download, 
   Sparkles,
   X,
-  Plus
+  Plus,
+  Save
 } from "lucide-react";
 
 interface MockupGeneratorProps {
-  accessToken: string;
+  userId: string;
+  onMockupSaved?: () => void;
 }
 
-export const MockupGenerator = ({ accessToken }: MockupGeneratorProps) => {
+export const MockupGenerator = ({ userId, onMockupSaved }: MockupGeneratorProps) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [stylePrompt, setStylePrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -119,6 +123,56 @@ export const MockupGenerator = ({ accessToken }: MockupGeneratorProps) => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const saveMockup = async () => {
+    if (!generatedImage) return;
+
+    setIsSaving(true);
+    try {
+      // Convert base64 to blob
+      const base64Data = generatedImage.split(",")[1];
+      const binaryData = atob(base64Data);
+      const bytes = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        bytes[i] = binaryData.charCodeAt(i);
+      }
+      const blob = new Blob([bytes], { type: "image/png" });
+
+      // Upload to storage
+      const fileName = `${userId}/${Date.now()}.png`;
+      const { error: uploadError } = await supabase.storage
+        .from("mockups" as any)
+        .upload(fileName, blob);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("mockups" as any)
+        .getPublicUrl(fileName);
+
+      // Save to database
+      const { error: dbError } = await supabase.from("mockups" as any).insert({
+        user_id: userId,
+        image_url: urlData.publicUrl,
+        style_prompt: stylePrompt || null,
+        original_images_count: uploadedImages.length,
+      });
+
+      if (dbError) throw dbError;
+
+      toast({ title: "Mockup saved!" });
+      onMockupSaved?.();
+    } catch (error) {
+      toast({
+        title: "Failed to save",
+        description: error instanceof Error ? error.message : "Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const resetForm = () => {
@@ -245,10 +299,22 @@ export const MockupGenerator = ({ accessToken }: MockupGeneratorProps) => {
                 <ImageIcon className="w-4 h-4 text-primary" />
                 <span className="font-medium">Generated Mockup</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={downloadImage}>
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={saveMockup} disabled={isSaving}>
+                  {isSaving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-1" />
+                      Save
+                    </>
+                  )}
+                </Button>
+                <Button variant="ghost" size="sm" onClick={downloadImage}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+              </div>
             </div>
             <div className="p-4">
               <img
