@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Sparkles, Loader2, Copy, Check, FileText, Plus } from "lucide-react";
+import { LogOut, Sparkles, Loader2, Copy, Check, FileText, Plus, ImageIcon } from "lucide-react";
 import { User, Session } from "@supabase/supabase-js";
+import { MockupGenerator } from "@/components/dashboard/MockupGenerator";
 
 interface ProposalResult {
   proposal: string;
@@ -196,14 +198,27 @@ const Dashboard = () => {
       </header>
 
       <main className="container-wide py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Create Your Proposal</h1>
-          <p className="text-muted-foreground">
-            Paste the job description and your portfolio content to generate a winning proposal.
-          </p>
-        </div>
+        <Tabs defaultValue="proposal" className="space-y-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="proposal" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Proposal Generator
+            </TabsTrigger>
+            <TabsTrigger value="mockup" className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              Mockup Creator
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+          <TabsContent value="proposal" className="space-y-8">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2">Create Your Proposal</h1>
+              <p className="text-muted-foreground">
+                Paste the job description and your portfolio content to generate a winning proposal.
+              </p>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-8">
           {/* Input Section */}
           <div className="space-y-6">
             <div className="space-y-3">
@@ -346,7 +361,20 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-        </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="mockup" className="space-y-8">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2">Create Beautiful Mockups</h1>
+              <p className="text-muted-foreground">
+                Upload screenshots or images and let AI transform them into stunning presentations.
+              </p>
+            </div>
+
+            <MockupGenerator accessToken={session?.access_token || ""} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
