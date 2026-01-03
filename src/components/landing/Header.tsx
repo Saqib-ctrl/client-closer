@@ -28,10 +28,10 @@ const Header = () => {
           
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="#" className="btn-ghost">
+            <a href="/auth" className="btn-ghost">
               Log in
             </a>
-            <a href="#pricing" className="btn-primary text-sm px-4 py-2">
+            <a href="/auth" className="btn-primary text-sm px-4 py-2">
               Get started
             </a>
           </div>
@@ -65,10 +65,10 @@ const Header = () => {
                 Pricing
               </a>
               <div className="pt-4 border-t border-border flex flex-col gap-3">
-                <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a href="/auth" className="text-muted-foreground hover:text-foreground transition-colors">
                   Log in
                 </a>
-                <a href="#pricing" className="btn-primary text-center">
+                <a href="/auth" className="btn-primary text-center">
                   Get started
                 </a>
               </div>
