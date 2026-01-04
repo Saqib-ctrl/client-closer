@@ -1,37 +1,56 @@
 import { ArrowRight, Play } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const Hero = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"]
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   return (
-    <section className="section-padding pt-24 md:pt-32 lg:pt-40 relative overflow-hidden">
-      {/* Animated background elements */}
+    <section ref={sectionRef} className="section-padding pt-24 md:pt-32 lg:pt-40 relative overflow-hidden">
+      {/* Parallax background elements */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
-        transition={{ duration: 1.5 }}
+        style={{ y: backgroundY }}
         className="absolute inset-0 overflow-hidden pointer-events-none"
       >
         <motion.div
-          animate={{ 
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-            scale: [1, 1.1, 1]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ 
-            x: [0, -30, 0],
-            y: [0, 50, 0],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"
-        />
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0"
+        >
+          <motion.div
+            animate={{ 
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{ 
+              x: [0, -30, 0],
+              y: [0, 50, 0],
+              scale: [1, 1.2, 1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"
+          />
+          {/* Additional parallax decorative elements */}
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-2xl" />
+          <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-primary/3 rounded-full blur-2xl" />
+        </motion.div>
       </motion.div>
 
-      <div className="container-narrow text-center relative z-10">
+      <motion.div style={{ y: textY, opacity }} className="container-narrow text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,7 +155,7 @@ const Hero = () => {
             </p>
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
     </section>
   );
 };
