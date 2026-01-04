@@ -1,4 +1,5 @@
 import { Palette, Code, Megaphone, Video } from "lucide-react";
+import { motion } from "framer-motion";
 
 const audiences = [
   {
@@ -23,33 +24,74 @@ const audiences = [
   }
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut" as const
+    }
+  }
+};
+
 const Audience = () => {
   return (
     <section className="section-padding bg-muted/50">
       <div className="container-wide">
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
             Built for every freelancer.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Whatever your skill, your proposals should work as hard as you do.
           </p>
-        </div>
+        </motion.div>
         
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
           {audiences.map((audience, index) => (
-            <div 
+            <motion.div 
               key={index}
-              className="bg-card rounded-xl p-6 card-elevated group"
+              variants={itemVariants}
+              whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              className="bg-card rounded-xl p-6 card-elevated group cursor-pointer"
             >
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary group-hover:scale-105 transition-all duration-300">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary transition-colors duration-300"
+              >
                 <audience.icon className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
-              </div>
+              </motion.div>
               <h3 className="text-xl font-semibold mb-2">{audience.title}</h3>
               <p className="text-muted-foreground">{audience.description}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
