@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { useState, useRef } from "react";
+import demoVideo from "@/assets/demo-video.mp4";
 
 const DemoVideo = () => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const togglePlay = () => {
@@ -17,8 +19,15 @@ const DemoVideo = () => {
     }
   };
 
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
   return (
-    <section className="section-padding bg-gradient-to-b from-background to-muted/30">
+    <section id="demo" className="section-padding bg-gradient-to-b from-background to-muted/30">
       <div className="container-wide">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -46,51 +55,71 @@ const DemoVideo = () => {
           className="relative max-w-4xl mx-auto"
         >
           {/* Video Container with glow effect */}
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-border/50">
-            {/* Gradient overlay for visual appeal */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-primary/5 pointer-events-none z-10" />
-            
-            {/* Placeholder video - replace with actual demo video */}
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 border border-border/50 group">
+            {/* Video */}
             <div className="aspect-video bg-gradient-to-br from-muted to-muted/50 relative">
               <video
                 ref={videoRef}
                 className="w-full h-full object-cover"
-                poster=""
+                muted={isMuted}
+                loop
+                playsInline
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
               >
-                {/* Add your demo video source here */}
-                <source src="" type="video/mp4" />
+                <source src={demoVideo} type="video/mp4" />
               </video>
               
-              {/* Placeholder content when no video */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
+              {/* Play/Pause overlay */}
+              {!isPlaying && (
                 <motion.div
-                  animate={{ 
-                    scale: [1, 1.05, 1],
-                    opacity: [0.8, 1, 0.8]
-                  }}
-                  transition={{ 
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="text-center"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 flex items-center justify-center bg-foreground/5 backdrop-blur-[2px] cursor-pointer"
+                  onClick={togglePlay}
                 >
-                  <div className="w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center backdrop-blur-sm border border-primary/20">
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center cursor-pointer shadow-lg shadow-primary/30">
-                        <Play className="w-6 h-6 text-primary-foreground ml-1" />
-                      </div>
-                    </motion.div>
-                  </div>
-                  <p className="text-muted-foreground font-medium">Demo video coming soon</p>
-                  <p className="text-sm text-muted-foreground/70 mt-1">See the magic in action</p>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    animate={{ 
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30"
+                  >
+                    <Play className="w-8 h-8 text-primary-foreground ml-1" />
+                  </motion.div>
                 </motion.div>
+              )}
+
+              {/* Video controls */}
+              <div className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-foreground/80 to-transparent transition-opacity ${isPlaying ? 'opacity-0 group-hover:opacity-100' : 'opacity-0'}`}>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={togglePlay}
+                    className="w-10 h-10 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center hover:bg-primary-foreground/30 transition-colors"
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 text-primary-foreground" />
+                    ) : (
+                      <Play className="w-5 h-5 text-primary-foreground ml-0.5" />
+                    )}
+                  </button>
+                  <button
+                    onClick={toggleMute}
+                    className="w-10 h-10 rounded-full bg-primary-foreground/20 backdrop-blur-sm flex items-center justify-center hover:bg-primary-foreground/30 transition-colors"
+                  >
+                    {isMuted ? (
+                      <VolumeX className="w-5 h-5 text-primary-foreground" />
+                    ) : (
+                      <Volume2 className="w-5 h-5 text-primary-foreground" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
