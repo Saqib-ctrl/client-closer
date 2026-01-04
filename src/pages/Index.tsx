@@ -5,6 +5,7 @@ import Problem from "@/components/landing/Problem";
 import Solution from "@/components/landing/Solution";
 import Value from "@/components/landing/Value";
 import Example from "@/components/landing/Example";
+import Testimonials from "@/components/landing/Testimonials";
 import Audience from "@/components/landing/Audience";
 import Pricing from "@/components/landing/Pricing";
 import Trust from "@/components/landing/Trust";
@@ -22,6 +23,7 @@ const Index = () => {
         <Solution />
         <Value />
         <Example />
+        <Testimonials />
         <Audience />
         <Pricing />
         <Trust />
