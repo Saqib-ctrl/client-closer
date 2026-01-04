@@ -9,18 +9,21 @@ import Example from "@/components/landing/Example";
 import Testimonials from "@/components/landing/Testimonials";
 import StatsCounter from "@/components/landing/StatsCounter";
 import Audience from "@/components/landing/Audience";
+import ComparisonTable from "@/components/landing/ComparisonTable";
 import Pricing from "@/components/landing/Pricing";
 import FAQ from "@/components/landing/FAQ";
 import Trust from "@/components/landing/Trust";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import MobileStickyCTA from "@/components/landing/MobileStickyCTA";
+import MouseFollowOrbs from "@/components/landing/MouseFollowOrbs";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <MouseFollowOrbs />
       <Header />
-      <main>
+      <main className="relative z-10">
         <Hero />
         <LogoBar />
         <Problem />
@@ -31,6 +34,7 @@ const Index = () => {
         <Testimonials />
         <StatsCounter />
         <Audience />
+        <ComparisonTable />
         <Pricing />
         <FAQ />
         <Trust />
