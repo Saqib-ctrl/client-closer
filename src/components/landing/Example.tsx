@@ -1,23 +1,44 @@
+import { motion } from "framer-motion";
+
 const Example = () => {
   return (
     <section id="example" className="section-padding">
       <div className="container-wide">
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
             See the difference.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             The same freelancer. The same skills. One gets ignored. One gets hired.
           </p>
-        </div>
+        </motion.div>
         
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
           {/* Before */}
-          <div className="rounded-xl border-2 border-border p-6 lg:p-8">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border-2 border-border p-6 lg:p-8 transition-all duration-300"
+          >
             <div className="flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm font-medium">
+              <motion.span
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.2, type: "spring" }}
+                className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-sm font-medium"
+              >
                 Before
-              </span>
+              </motion.span>
               <span className="text-sm text-muted-foreground">Generic proposal</span>
             </div>
             
@@ -40,25 +61,52 @@ const Example = () => {
               </p>
             </div>
             
-            <div className="mt-6 pt-6 border-t border-border">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="mt-6 pt-6 border-t border-border"
+            >
               <p className="text-sm text-muted-foreground italic">
                 ❌ No mention of client's specific needs<br />
                 ❌ Generic portfolio link<br />
                 ❌ No clear value proposition
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
           {/* After */}
-          <div className="rounded-xl border-2 border-primary p-6 lg:p-8 bg-primary/[0.02]">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-medium">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border-2 border-primary p-6 lg:p-8 bg-primary/[0.02] transition-all duration-300 relative overflow-hidden"
+          >
+            {/* Shimmer effect */}
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "200%" }}
+              transition={{ duration: 3, repeat: Infinity, repeatDelay: 5 }}
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent pointer-events-none"
+            />
+            
+            <div className="flex items-center gap-2 mb-6 relative z-10">
+              <motion.span
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.3, type: "spring" }}
+                className="px-3 py-1 rounded-full bg-primary text-primary-foreground text-sm font-medium"
+              >
                 After
-              </span>
+              </motion.span>
               <span className="text-sm text-foreground font-medium">Client-specific proposal</span>
             </div>
             
-            <div className="space-y-4 text-foreground">
+            <div className="space-y-4 text-foreground relative z-10">
               <p className="text-sm leading-relaxed font-medium">
                 Re: E-commerce rebuild for your outdoor gear shop
               </p>
@@ -78,14 +126,20 @@ const Example = () => {
               </p>
             </div>
             
-            <div className="mt-6 pt-6 border-t border-primary/20">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              className="mt-6 pt-6 border-t border-primary/20 relative z-10"
+            >
               <p className="text-sm text-primary">
                 ✓ Addresses specific client problem<br />
                 ✓ Shows relevant experience<br />
                 ✓ Clear scope and pricing
               </p>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>
