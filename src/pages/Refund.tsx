@@ -22,7 +22,7 @@ const Refund = () => {
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">1. Refund Policy</h2>
               <p className="text-muted-foreground">
-                We offer refunds in accordance with Paddle's refund policy. If you are not satisfied with your purchase, you may request a refund.
+                We offer a <strong>14-day refund window</strong> from the date of purchase. If you are not satisfied with your purchase, you may request a full refund within 14 days of your initial transaction, no questions asked. This is in accordance with Paddle's standard refund policy.
               </p>
             </section>
 
