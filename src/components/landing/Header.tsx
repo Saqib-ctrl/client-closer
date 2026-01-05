@@ -51,7 +51,7 @@ const Header = () => {
   const navLinks = [
     { id: "demo", label: "Demo" },
     { id: "example", label: "Example" },
-    { id: "pricing", label: "Pricing" },
+    { id: "pricing", label: "Pricing", href: "/pricing" },
     { id: "faq", label: "FAQ" }
   ];
 
@@ -78,8 +78,8 @@ const Header = () => {
             {navLinks.map((link) => (
               <a
                 key={link.id}
-                href={`#${link.id}`}
-                onClick={(e) => scrollToSection(e, link.id)}
+                href={link.href || `#${link.id}`}
+                onClick={link.href ? undefined : (e) => scrollToSection(e, link.id)}
                 className={`text-sm transition-colors relative ${
                   activeSection === link.id
                     ? "text-foreground font-medium"
@@ -148,8 +148,8 @@ const Header = () => {
               {navLinks.map((link) => (
                 <a
                   key={link.id}
-                  href={`#${link.id}`}
-                  onClick={(e) => scrollToSection(e, link.id)}
+                  href={link.href || `#${link.id}`}
+                  onClick={link.href ? () => setIsMenuOpen(false) : (e) => scrollToSection(e, link.id)}
                   className={`transition-colors ${
                     activeSection === link.id
                       ? "text-foreground font-medium"
