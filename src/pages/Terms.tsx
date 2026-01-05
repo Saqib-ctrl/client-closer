@@ -12,6 +12,17 @@ const Terms = () => {
           <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
             <p className="text-muted-foreground">Last updated: January 5, 2026</p>
             
+            <section className="space-y-4 p-4 bg-muted/50 rounded-lg border">
+              <h2 className="text-xl font-semibold">Company Information</h2>
+              <p className="text-muted-foreground">
+                These Terms and Conditions are entered into between you and <strong>Propel</strong> (the "Company", "we", "us", or "our").
+              </p>
+              <ul className="text-muted-foreground list-disc list-inside space-y-1">
+                <li><strong>Legal Business Name:</strong> Propel</li>
+                <li><strong>Contact Email:</strong> support@propel.app</li>
+              </ul>
+            </section>
+
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">1. Agreement to Terms</h2>
               <p className="text-muted-foreground">
