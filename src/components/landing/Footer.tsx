@@ -20,6 +20,9 @@ const Footer = () => {
             <a href="/refund" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Refund Policy
             </a>
+            <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Contact
+            </a>
           </nav>
           
           <p className="text-sm text-muted-foreground">
