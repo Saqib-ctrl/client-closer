@@ -16,12 +16,10 @@ import Trust from "@/components/landing/Trust";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import MobileStickyCTA from "@/components/landing/MobileStickyCTA";
-import MouseFollowOrbs from "@/components/landing/MouseFollowOrbs";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background relative">
-      <MouseFollowOrbs />
       <Header />
       <main className="relative z-10">
         <Hero />
