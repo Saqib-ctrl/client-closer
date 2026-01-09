@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Sparkles, Edit3 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const jobDescription = `Looking for a talented UI/UX designer to redesign our mobile banking app. Need someone with fintech experience who understands user psychology and can create intuitive interfaces.`;
+const sampleJobDescription = `Looking for a talented UI/UX designer to redesign our mobile banking app. Need someone with fintech experience who understands user psychology and can create intuitive interfaces.`;
 
 const generatedProposal = `Hi! I noticed you're looking to redesign your mobile banking app, and I'm excited about the opportunity.
 
@@ -15,15 +16,15 @@ I'd love to discuss your vision and show you some relevant case studies. Availab
 const InteractiveDemo = () => {
   const [stage, setStage] = useState<"input" | "processing" | "output">("input");
   const [typedText, setTypedText] = useState("");
-  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
+  const [jobInput, setJobInput] = useState("");
+  const [isUsingCustom, setIsUsingCustom] = useState(false);
+  const navigate = useNavigate();
 
   const startDemo = () => {
-    setIsAutoPlaying(true);
     setStage("processing");
     
     setTimeout(() => {
       setStage("output");
-      // Start typing animation
       let i = 0;
       const typeInterval = setInterval(() => {
         if (i <= generatedProposal.length) {
@@ -31,17 +32,20 @@ const InteractiveDemo = () => {
           i++;
         } else {
           clearInterval(typeInterval);
-          setTimeout(() => {
-            setIsAutoPlaying(false);
-          }, 2000);
         }
-      }, 20);
-    }, 2000);
+      }, 15);
+    }, 1500);
   };
 
   const resetDemo = () => {
     setStage("input");
     setTypedText("");
+    setJobInput("");
+    setIsUsingCustom(false);
+  };
+
+  const handleTryOwn = () => {
+    navigate("/auth");
   };
 
   return (
@@ -58,7 +62,7 @@ const InteractiveDemo = () => {
             See the magic happen.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Watch how Propel transforms a job description into a winning proposal.
+            Watch how Propel transforms a job description into a winning proposal in seconds.
           </p>
         </motion.div>
 
@@ -71,13 +75,26 @@ const InteractiveDemo = () => {
         >
           <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-xl">
             {/* Header */}
-            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50 bg-muted/50">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                <div className="w-3 h-3 rounded-full bg-green-500/60" />
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-muted/50">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                </div>
+                <span className="text-xs text-muted-foreground ml-2">propel.app</span>
               </div>
-              <span className="text-xs text-muted-foreground ml-2">propel.app</span>
+              {stage === "input" && (
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={handleTryOwn}
+                  className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                >
+                  <Edit3 className="w-3 h-3" />
+                  Try with your own job
+                </motion.button>
+              )}
             </div>
 
             {/* Content */}
@@ -96,17 +113,19 @@ const InteractiveDemo = () => {
                       Paste the job description
                     </div>
                     <div className="bg-muted/50 rounded-lg p-4 border border-border/50 font-mono text-sm">
-                      {jobDescription}
+                      {sampleJobDescription}
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={startDemo}
-                      className="btn-primary w-full sm:w-auto"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate Proposal
-                    </motion.button>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={startDemo}
+                        className="btn-primary flex-1"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate Proposal
+                      </motion.button>
+                    </div>
                   </motion.div>
                 )}
 
@@ -123,8 +142,8 @@ const InteractiveDemo = () => {
                       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                       className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent mb-4"
                     />
-                    <p className="text-muted-foreground">Analyzing job requirements...</p>
-                    <p className="text-sm text-muted-foreground/60">Crafting personalized proposal</p>
+                    <p className="text-foreground font-medium">Analyzing job requirements...</p>
+                    <p className="text-sm text-muted-foreground">Crafting personalized proposal</p>
                   </motion.div>
                 )}
 
@@ -144,7 +163,7 @@ const InteractiveDemo = () => {
                       <motion.button
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        transition={{ delay: 3 }}
+                        transition={{ delay: 2 }}
                         onClick={resetDemo}
                         className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                       >
@@ -154,13 +173,40 @@ const InteractiveDemo = () => {
                     <div className="bg-muted/50 rounded-lg p-4 border border-border/50 min-h-[200px]">
                       <p className="text-sm whitespace-pre-wrap">
                         {typedText}
-                        <motion.span
-                          animate={{ opacity: [1, 0] }}
-                          transition={{ duration: 0.5, repeat: Infinity }}
-                          className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                        />
+                        {typedText.length < generatedProposal.length && (
+                          <motion.span
+                            animate={{ opacity: [1, 0] }}
+                            transition={{ duration: 0.5, repeat: Infinity }}
+                            className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
+                          />
+                        )}
                       </p>
                     </div>
+                    
+                    {/* CTA after demo completes */}
+                    {typedText.length === generatedProposal.length && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        className="pt-4 border-t border-border/50"
+                      >
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                          <p className="text-sm text-muted-foreground">
+                            <span className="text-foreground font-medium">Ready to win more clients?</span> Get 5 free proposals now.
+                          </p>
+                          <motion.a
+                            href="/auth"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="btn-primary group whitespace-nowrap"
+                          >
+                            Start Free
+                            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </motion.a>
+                        </div>
+                      </motion.div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

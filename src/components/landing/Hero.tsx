@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Zap } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -44,7 +44,6 @@ const Hero = () => {
             transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
             className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"
           />
-          {/* Additional parallax decorative elements */}
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/5 rounded-full blur-2xl" />
           <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-primary/3 rounded-full blur-2xl" />
         </motion.div>
@@ -60,9 +59,10 @@ const Hero = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
           >
-            ✨ AI-Powered Proposals
+            <Zap className="w-4 h-4" />
+            5 Free Proposals — No Credit Card
           </motion.span>
         </motion.div>
 
@@ -90,7 +90,7 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10"
         >
-          Create client-ready proposals and portfolios that convert — in minutes.
+          AI-powered proposals that convert. Paste the job, get a winning pitch in seconds.
         </motion.p>
         
         <motion.div
@@ -102,11 +102,13 @@ const Hero = () => {
           <motion.a
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="#pricing"
-            className="btn-primary group"
+            href="/auth"
+            className="btn-primary group relative overflow-hidden shadow-lg shadow-primary/25"
           >
-            Generate my proposal
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <span className="relative z-10 flex items-center">
+              Get 5 Free Proposals
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </span>
           </motion.a>
           <motion.a
             whileHover={{ scale: 1.02 }}
@@ -115,20 +117,28 @@ const Hero = () => {
             className="btn-secondary group"
           >
             <Play className="mr-2 w-4 h-4" />
-            Watch demo
+            See it in action
           </motion.a>
         </motion.div>
         
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-8 text-sm text-muted-foreground"
+          className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground"
         >
-          No credit card required to start
-        </motion.p>
+          <span className="flex items-center gap-1">
+            <span className="text-green-500">✓</span> No credit card
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="text-green-500">✓</span> Cancel anytime
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="text-green-500">✓</span> 30-second setup
+          </span>
+        </motion.div>
 
-        {/* Floating elements for visual interest */}
+        {/* Social proof floating card */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
