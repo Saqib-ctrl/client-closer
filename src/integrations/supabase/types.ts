@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ip_usage: {
+        Row: {
+          first_seen_at: string | null
+          id: string
+          ip_address: string
+          last_seen_at: string | null
+          proposals_generated: number | null
+        }
+        Insert: {
+          first_seen_at?: string | null
+          id?: string
+          ip_address: string
+          last_seen_at?: string | null
+          proposals_generated?: number | null
+        }
+        Update: {
+          first_seen_at?: string | null
+          id?: string
+          ip_address?: string
+          last_seen_at?: string | null
+          proposals_generated?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -77,12 +101,52 @@ export type Database = {
         }
         Relationships: []
       }
+      user_usage: {
+        Row: {
+          created_at: string | null
+          id: string
+          ip_address: string | null
+          is_premium: boolean | null
+          proposals_generated: number | null
+          proposals_limit: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_premium?: boolean | null
+          proposals_generated?: number | null
+          proposals_limit?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ip_address?: string | null
+          is_premium?: boolean | null
+          proposals_generated?: number | null
+          proposals_limit?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_usage_limit: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: Json
+      }
+      record_proposal_usage: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
