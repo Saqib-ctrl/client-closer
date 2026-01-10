@@ -1,18 +1,39 @@
 import { motion } from "framer-motion";
 import { Zap, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { usePaddleCheckout } from "@/components/PaddleCheckout";
 
 interface UsageIndicatorProps {
   used: number;
   limit: number;
   isPremium: boolean;
+  userId?: string;
+  userEmail?: string;
   onUpgrade?: () => void;
 }
 
-export const UsageIndicator = ({ used, limit, isPremium, onUpgrade }: UsageIndicatorProps) => {
+export const UsageIndicator = ({ used, limit, isPremium, userId, userEmail, onUpgrade }: UsageIndicatorProps) => {
   const remaining = Math.max(0, limit - used);
   const percentage = isPremium ? 0 : (used / limit) * 100;
   const isLow = remaining <= 2 && !isPremium;
   const isExhausted = remaining === 0 && !isPremium;
+  const navigate = useNavigate();
+
+  const { openCheckout } = usePaddleCheckout({
+    userId: userId || "",
+    userEmail
+  });
+
+  const handleUpgrade = () => {
+    if (!userId) {
+      navigate("/pricing");
+      return;
+    }
+    if (onUpgrade) {
+      onUpgrade();
+    }
+    openCheckout("monthly");
+  };
 
   if (isPremium) {
     return (
@@ -41,11 +62,11 @@ export const UsageIndicator = ({ used, limit, isPremium, onUpgrade }: UsageIndic
             )}
           </span>
         </div>
-        {(isLow || isExhausted) && onUpgrade && (
+        {(isLow || isExhausted) && (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={onUpgrade}
+            onClick={handleUpgrade}
             className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
           >
             Upgrade to Pro →
@@ -68,7 +89,7 @@ export const UsageIndicator = ({ used, limit, isPremium, onUpgrade }: UsageIndic
         />
       </div>
       
-      {isExhausted && onUpgrade && (
+      {isExhausted && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,7 +101,7 @@ export const UsageIndicator = ({ used, limit, isPremium, onUpgrade }: UsageIndic
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={onUpgrade}
+            onClick={handleUpgrade}
             className="btn-primary w-full"
           >
             <Crown className="w-4 h-4 mr-2" />
