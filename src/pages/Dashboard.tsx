@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,12 +8,16 @@ import { User, Session } from "@supabase/supabase-js";
 import { MockupGenerator } from "@/components/dashboard/MockupGenerator";
 import { ProposalGenerator } from "@/components/dashboard/ProposalGenerator";
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
+import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
+import { toast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [historyRefresh, setHistoryRefresh] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -22,6 +26,8 @@ const Dashboard = () => {
       
       if (!session?.user) {
         navigate("/auth");
+      } else {
+        fetchUserUsage(session.user.id);
       }
     });
 
@@ -31,11 +37,45 @@ const Dashboard = () => {
       
       if (!session?.user) {
         navigate("/auth");
+      } else {
+        fetchUserUsage(session.user.id);
       }
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Check for upgrade success
+  useEffect(() => {
+    if (searchParams.get("upgraded") === "true") {
+      toast({
+        title: "Welcome to Pro!",
+        description: "Your subscription is now active. Enjoy unlimited proposals!"
+      });
+      // Clean up URL
+      window.history.replaceState({}, "", "/dashboard");
+      // Refresh user status
+      if (user) {
+        fetchUserUsage(user.id);
+      }
+    }
+  }, [searchParams, user]);
+
+  const fetchUserUsage = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("user_usage")
+        .select("is_premium")
+        .eq("user_id", userId)
+        .single();
+
+      if (!error && data) {
+        setIsPremium(data.is_premium || false);
+      }
+    } catch (error) {
+      console.error("Error fetching user usage:", error);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -44,6 +84,12 @@ const Dashboard = () => {
 
   const triggerHistoryRefresh = () => {
     setHistoryRefresh((prev) => prev + 1);
+  };
+
+  const handleSubscriptionChange = () => {
+    if (user) {
+      fetchUserUsage(user.id);
+    }
   };
 
   if (!user) {
@@ -66,6 +112,11 @@ const Dashboard = () => {
           </a>
           
           <div className="flex items-center gap-4">
+            <SubscriptionStatus 
+              userId={user.id} 
+              isPremium={isPremium}
+              onStatusChange={handleSubscriptionChange}
+            />
             <span className="text-sm text-muted-foreground hidden sm:block">
               {user.email}
             </span>

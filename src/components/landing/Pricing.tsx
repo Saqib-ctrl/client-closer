@@ -1,6 +1,9 @@
 import { Check, ArrowRight, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { usePaddleCheckout } from "@/components/PaddleCheckout";
 
 const freeFeatures = [
   "5 free proposals",
@@ -20,11 +23,35 @@ const proFeatures = [
 
 const Pricing = () => {
   const [isYearly, setIsYearly] = useState(false);
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const navigate = useNavigate();
   
   const monthlyPrice = 19;
   const yearlyPrice = 15;
   const currentPrice = isYearly ? yearlyPrice : monthlyPrice;
   const savings = Math.round((1 - yearlyPrice / monthlyPrice) * 100);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({ id: session.user.id, email: session.user.email });
+      }
+    });
+  }, []);
+
+  const { openCheckout } = usePaddleCheckout({
+    userId: user?.id || "",
+    userEmail: user?.email
+  });
+
+  const handleProPlanClick = () => {
+    if (!user) {
+      // Redirect to auth with return URL
+      navigate("/auth?redirect=/pricing&plan=" + (isYearly ? "yearly" : "monthly"));
+      return;
+    }
+    openCheckout(isYearly ? "yearly" : "monthly");
+  };
 
   return (
     <section id="pricing" className="section-padding">
@@ -180,15 +207,15 @@ const Pricing = () => {
                   ))}
                 </ul>
                 
-                <motion.a
-                  href="/auth"
+                <motion.button
+                  onClick={handleProPlanClick}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="btn-primary w-full group"
                 >
                   Get Unlimited Proposals
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </motion.a>
+                </motion.button>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
                   14-day money-back guarantee

@@ -101,6 +101,48 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          created_at: string | null
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
+          plan_type: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          plan_type?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          created_at?: string | null
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
+          plan_type?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_usage: {
         Row: {
           created_at: string | null
