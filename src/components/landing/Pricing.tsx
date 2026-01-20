@@ -24,6 +24,7 @@ const proFeatures = [
 const Pricing = () => {
   const [isYearly, setIsYearly] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
   const navigate = useNavigate();
   
   const monthlyPrice = 19;
@@ -32,24 +33,41 @@ const Pricing = () => {
   const savings = Math.round((1 - yearlyPrice / monthlyPrice) * 100);
 
   useEffect(() => {
+    setIsLoadingSession(true);
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         setUser({ id: session.user.id, email: session.user.email });
       }
+      setIsLoadingSession(false);
+    }).catch(() => {
+      setIsLoadingSession(false);
     });
   }, []);
 
-  const { openCheckout } = usePaddleCheckout({
+  // Only create the hook with valid userId when user is loaded
+  const { openCheckout, isReady } = usePaddleCheckout({
     userId: user?.id || "",
     userEmail: user?.email
   });
 
   const handleProPlanClick = () => {
-    if (!user) {
-      // Redirect to auth with return URL
+    // If still loading session, wait
+    if (isLoadingSession) {
+      return;
+    }
+    
+    // If no user, redirect to auth
+    if (!user || !user.id) {
       navigate("/auth?redirect=/pricing&plan=" + (isYearly ? "yearly" : "monthly"));
       return;
     }
+    
+    // Validate that we have a proper userId before checkout
+    if (!isReady) {
+      console.log("Paddle not ready yet, waiting...");
+      return;
+    }
+    
     openCheckout(isYearly ? "yearly" : "monthly");
   };
 
@@ -211,10 +229,11 @@ const Pricing = () => {
                   onClick={handleProPlanClick}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary w-full group"
+                  disabled={isLoadingSession}
+                  className="btn-primary w-full group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Get Unlimited Proposals
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {isLoadingSession ? "Loading..." : "Get Unlimited Proposals"}
+                  {!isLoadingSession && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                 </motion.button>
                 
                 <p className="text-center text-sm text-muted-foreground mt-4">
