@@ -53,6 +53,36 @@ export type Database = {
         }
         Relationships: []
       }
+      emails: {
+        Row: {
+          context: string
+          created_at: string
+          email_type: string
+          generated_email: string | null
+          id: string
+          subject_line: string | null
+          user_id: string
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          email_type?: string
+          generated_email?: string | null
+          id?: string
+          subject_line?: string | null
+          user_id: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          email_type?: string
+          generated_email?: string | null
+          id?: string
+          subject_line?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ip_usage: {
         Row: {
           first_seen_at: string | null
@@ -209,11 +239,40 @@ export type Database = {
         }
         Relationships: []
       }
+      templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_usage: {
         Row: {
           cover_letters_generated: number | null
           cover_letters_limit: number | null
           created_at: string | null
+          emails_generated: number | null
+          emails_limit: number | null
           id: string
           ip_address: string | null
           is_premium: boolean | null
@@ -228,6 +287,8 @@ export type Database = {
           cover_letters_generated?: number | null
           cover_letters_limit?: number | null
           created_at?: string | null
+          emails_generated?: number | null
+          emails_limit?: number | null
           id?: string
           ip_address?: string | null
           is_premium?: boolean | null
@@ -242,6 +303,8 @@ export type Database = {
           cover_letters_generated?: number | null
           cover_letters_limit?: number | null
           created_at?: string | null
+          emails_generated?: number | null
+          emails_limit?: number | null
           id?: string
           ip_address?: string | null
           is_premium?: boolean | null
@@ -263,6 +326,10 @@ export type Database = {
         Args: { p_ip: string; p_user_id: string }
         Returns: Json
       }
+      check_email_usage_limit: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: Json
+      }
       check_mockup_usage_limit: {
         Args: { p_ip: string; p_user_id: string }
         Returns: Json
@@ -272,6 +339,10 @@ export type Database = {
         Returns: Json
       }
       record_cover_letter_usage: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: undefined
+      }
+      record_email_usage: {
         Args: { p_ip: string; p_user_id: string }
         Returns: undefined
       }

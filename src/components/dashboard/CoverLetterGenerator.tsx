@@ -9,8 +9,10 @@ import { UsageIndicator } from "./UsageIndicator";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 import { 
   Sparkles, Loader2, Copy, Check, FileText, Plus, Save, 
-  Briefcase, Building2, Download 
+  Briefcase, Building2, Download, BookmarkPlus
 } from "lucide-react";
+import { exportToPdf } from "@/lib/exportToPdf";
+import { saveAsTemplate } from "./TemplatesLibrary";
 
 interface CoverLetterResult {
   coverLetter: string;
@@ -318,18 +320,11 @@ export const CoverLetterGenerator = ({ userId, userEmail, onCoverLetterSaved }: 
                     <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.coverLetter)}>
                       {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => {
-                      const blob = new Blob([result.coverLetter], { type: "text/plain" });
-                      const url = URL.createObjectURL(blob);
-                      const link = document.createElement("a");
-                      link.href = url;
-                      link.download = "cover-letter.txt";
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      URL.revokeObjectURL(url);
-                    }}>
+                    <Button variant="ghost" size="sm" onClick={() => exportToPdf(result.coverLetter, "cover-letter.pdf")} title="Download PDF">
                       <Download className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => saveAsTemplate(userId, "cover-letter", `${jobTitle || "Cover Letter"} - ${companyName || ""}`.trim(), result.coverLetter, toast)} title="Save as Template">
+                      <BookmarkPlus className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
