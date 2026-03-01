@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Loader2, Copy, Check, FileText, Plus, Save } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check, FileText, Plus, Save, Download } from "lucide-react";
 import { UsageIndicator } from "./UsageIndicator";
 import { useNavigate } from "react-router-dom";
 
@@ -361,7 +361,7 @@ export const ProposalGenerator = ({ userId, onProposalSaved }: ProposalGenerator
                     <span className="font-medium">Your Proposal</span>
                     <span className="text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Auto-saved</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -372,6 +372,23 @@ export const ProposalGenerator = ({ userId, onProposalSaved }: ProposalGenerator
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const blob = new Blob([result.proposal], { type: "text/plain" });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = "proposal.txt";
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      <Download className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
