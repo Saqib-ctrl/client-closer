@@ -9,7 +9,7 @@ import { UsageIndicator } from "./UsageIndicator";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 import { 
   Sparkles, Loader2, Copy, Check, FileText, Plus, Save, 
-  Briefcase, Building2 
+  Briefcase, Building2, Download 
 } from "lucide-react";
 
 interface CoverLetterResult {
@@ -314,9 +314,24 @@ export const CoverLetterGenerator = ({ userId, userEmail, onCoverLetterSaved }: 
                     <span className="font-medium">Your Cover Letter</span>
                     <span className="text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded">Auto-saved</span>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.coverLetter)}>
-                    {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.coverLetter)}>
+                      {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      const blob = new Blob([result.coverLetter], { type: "text/plain" });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.download = "cover-letter.txt";
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      URL.revokeObjectURL(url);
+                    }}>
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="p-4">
                   <p className="whitespace-pre-wrap text-sm leading-relaxed">{result.coverLetter}</p>
