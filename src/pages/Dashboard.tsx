@@ -3,19 +3,29 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Loader2, FileText, ImageIcon, Clock } from "lucide-react";
+import { 
+  LogOut, Loader2, FileText, ImageIcon, Clock, Mail, 
+  Crown, Settings, LayoutDashboard, ChevronRight, Sparkles,
+  Menu, X
+} from "lucide-react";
 import { User, Session } from "@supabase/supabase-js";
+import { motion, AnimatePresence } from "framer-motion";
 import { MockupGenerator } from "@/components/dashboard/MockupGenerator";
 import { ProposalGenerator } from "@/components/dashboard/ProposalGenerator";
+import { CoverLetterGenerator } from "@/components/dashboard/CoverLetterGenerator";
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
 import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
+import { UsageOverview } from "@/components/dashboard/UsageOverview";
 import { toast } from "@/hooks/use-toast";
+import { usePaddleCheckout } from "@/components/PaddleCheckout";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [historyRefresh, setHistoryRefresh] = useState(0);
   const [isPremium, setIsPremium] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -23,41 +33,25 @@ const Dashboard = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (!session?.user) {
-        navigate("/auth");
-      } else {
-        fetchUserUsage(session.user.id);
-      }
+      if (!session?.user) navigate("/auth");
+      else fetchUserUsage(session.user.id);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      
-      if (!session?.user) {
-        navigate("/auth");
-      } else {
-        fetchUserUsage(session.user.id);
-      }
+      if (!session?.user) navigate("/auth");
+      else fetchUserUsage(session.user.id);
     });
 
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Check for upgrade success
   useEffect(() => {
     if (searchParams.get("upgraded") === "true") {
-      toast({
-        title: "Welcome to Pro!",
-        description: "Your subscription is now active. Enjoy unlimited proposals!"
-      });
-      // Clean up URL
+      toast({ title: "Welcome to Pro! 🎉", description: "Your subscription is now active. Enjoy unlimited access to all tools!" });
       window.history.replaceState({}, "", "/dashboard");
-      // Refresh user status
-      if (user) {
-        fetchUserUsage(user.id);
-      }
+      if (user) fetchUserUsage(user.id);
     }
   }, [searchParams, user]);
 
@@ -68,10 +62,7 @@ const Dashboard = () => {
         .select("is_premium")
         .eq("user_id", userId)
         .single();
-
-      if (!error && data) {
-        setIsPremium(data.is_premium || false);
-      }
+      if (!error && data) setIsPremium(data.is_premium || false);
     } catch (error) {
       console.error("Error fetching user usage:", error);
     }
@@ -82,112 +73,270 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const triggerHistoryRefresh = () => {
-    setHistoryRefresh((prev) => prev + 1);
-  };
-
-  const handleSubscriptionChange = () => {
-    if (user) {
-      fetchUserUsage(user.id);
-    }
-  };
+  const triggerHistoryRefresh = () => setHistoryRefresh((prev) => prev + 1);
+  const handleSubscriptionChange = () => { if (user) fetchUserUsage(user.id); };
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto" />
+          <p className="text-sm text-muted-foreground">Loading your workspace...</p>
+        </div>
       </div>
     );
   }
 
+  const navItems = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "proposal", label: "Proposals", icon: FileText },
+    { id: "mockup", label: "Mockups", icon: ImageIcon },
+    { id: "cover-letter", label: "Cover Letters", icon: Mail },
+    { id: "history", label: "History", icon: Clock },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-50">
-        <div className="container-wide flex items-center justify-between h-16">
-          <a href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card/50 backdrop-blur-sm">
+        <div className="p-6 border-b border-border">
+          <a href="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
               <span className="text-primary-foreground font-bold text-sm">P</span>
             </div>
-            <span className="font-semibold text-lg">Propel</span>
+            <span className="font-bold text-xl tracking-tight">Propel</span>
           </a>
-          
-          <div className="flex items-center gap-4">
-            <SubscriptionStatus 
-              userId={user.id} 
-              isPremium={isPremium}
-              onStatusChange={handleSubscriptionChange}
-            />
-            <span className="text-sm text-muted-foreground hidden sm:block">
-              {user.email}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Log out
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  isActive 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                }`}
+              >
+                <Icon className="w-4.5 h-4.5" />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-border space-y-3">
+          {!isPremium && (
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold">Upgrade to Pro</span>
+              </div>
+              <p className="text-xs text-muted-foreground">Unlimited access to all AI tools for $19/mo</p>
+              <UpgradeButton userId={user.id} userEmail={user.email} />
+            </div>
+          )}
+          <div className="flex items-center gap-3 px-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-xs font-semibold text-primary">
+                {user.email?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{user.email}</p>
+              <p className="text-xs text-muted-foreground">{isPremium ? "Pro Plan" : "Free Plan"}</p>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleLogout} className="shrink-0">
+              <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <main className="container-wide py-8">
-        <Tabs defaultValue="proposal" className="space-y-8">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
-            <TabsTrigger value="proposal" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Proposals</span>
-            </TabsTrigger>
-            <TabsTrigger value="mockup" className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Mockups</span>
-            </TabsTrigger>
-            <TabsTrigger value="history" className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span className="hidden sm:inline">History</span>
-            </TabsTrigger>
-          </TabsList>
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
+        <div className="flex items-center justify-between h-14 px-4">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(!sidebarOpen)}>
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <a href="/" className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs">P</span>
+              </div>
+              <span className="font-bold text-lg">Propel</span>
+            </a>
+          </div>
+          <div className="flex items-center gap-2">
+            {isPremium && <Crown className="w-4 h-4 text-primary" />}
+            <Button variant="ghost" size="icon" onClick={handleLogout}>
+              <LogOut className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
 
-          <TabsContent value="proposal" className="space-y-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Create Your Proposal</h1>
-              <p className="text-muted-foreground">
-                Paste the job description and your portfolio content to generate a winning proposal.
+        {/* Mobile Nav */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="border-t border-border bg-card overflow-hidden"
+            >
+              <nav className="p-3 space-y-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        activeTab === item.id 
+                          ? "bg-primary text-primary-foreground" 
+                          : "text-muted-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Main Content */}
+      <main className="flex-1 lg:overflow-y-auto">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 mt-14 lg:mt-0">
+          {/* Header bar */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
+                {navItems.find(n => n.id === activeTab)?.label || "Dashboard"}
+              </h1>
+              <p className="text-muted-foreground text-sm mt-1">
+                {activeTab === "overview" && "Your AI toolkit at a glance"}
+                {activeTab === "proposal" && "Generate winning freelance proposals"}
+                {activeTab === "mockup" && "Transform screenshots into stunning presentations"}
+                {activeTab === "cover-letter" && "Create personalized cover letters in seconds"}
+                {activeTab === "history" && "View and manage your saved content"}
               </p>
             </div>
-
-            <ProposalGenerator 
-              userId={user.id} 
-              onProposalSaved={triggerHistoryRefresh} 
-            />
-          </TabsContent>
-
-          <TabsContent value="mockup" className="space-y-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Create Beautiful Mockups</h1>
-              <p className="text-muted-foreground">
-                Upload screenshots or images and let AI transform them into stunning presentations.
-              </p>
+            <div className="hidden lg:block">
+              <SubscriptionStatus 
+                userId={user.id} 
+                isPremium={isPremium}
+                onStatusChange={handleSubscriptionChange}
+              />
             </div>
+          </div>
 
-            <MockupGenerator 
-              userId={user.id} 
-              userEmail={user.email}
-              onMockupSaved={triggerHistoryRefresh} 
-            />
-          </TabsContent>
+          {/* Overview Tab */}
+          {activeTab === "overview" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+              <UsageOverview userId={user.id} isPremium={isPremium} />
+              
+              {/* Quick Actions */}
+              <div>
+                <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    { id: "proposal", icon: FileText, title: "New Proposal", desc: "Generate a tailored proposal", color: "bg-primary/10", iconColor: "text-primary" },
+                    { id: "mockup", icon: ImageIcon, title: "New Mockup", desc: "Create a beautiful presentation", color: "bg-primary/10", iconColor: "text-primary" },
+                    { id: "cover-letter", icon: Mail, title: "New Cover Letter", desc: "Write a personalized letter", color: "bg-primary/10", iconColor: "text-primary" },
+                  ].map((action) => {
+                    const Icon = action.icon;
+                    return (
+                      <motion.button
+                        key={action.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setActiveTab(action.id)}
+                        className="flex items-center gap-4 p-5 rounded-xl border border-border bg-card hover:shadow-md transition-all text-left group"
+                      >
+                        <div className={`w-11 h-11 rounded-xl ${action.color} flex items-center justify-center`}>
+                          <Icon className={`w-5 h-5 ${action.iconColor}`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{action.title}</p>
+                          <p className="text-xs text-muted-foreground">{action.desc}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <TabsContent value="history" className="space-y-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Your History</h1>
-              <p className="text-muted-foreground">
-                View and manage your saved proposals and mockups.
-              </p>
-            </div>
+              {/* Recent Activity */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Recent Activity</h2>
+                  <button 
+                    onClick={() => setActiveTab("history")}
+                    className="text-sm text-primary hover:text-primary/80 font-medium"
+                  >
+                    View all →
+                  </button>
+                </div>
+                <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} compact />
+              </div>
+            </motion.div>
+          )}
 
-            <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} />
-          </TabsContent>
-        </Tabs>
+          {/* Proposal Tab */}
+          {activeTab === "proposal" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <ProposalGenerator userId={user.id} onProposalSaved={triggerHistoryRefresh} />
+            </motion.div>
+          )}
+
+          {/* Mockup Tab */}
+          {activeTab === "mockup" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <MockupGenerator userId={user.id} userEmail={user.email} onMockupSaved={triggerHistoryRefresh} />
+            </motion.div>
+          )}
+
+          {/* Cover Letter Tab */}
+          {activeTab === "cover-letter" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <CoverLetterGenerator userId={user.id} userEmail={user.email} onCoverLetterSaved={triggerHistoryRefresh} />
+            </motion.div>
+          )}
+
+          {/* History Tab */}
+          {activeTab === "history" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} />
+            </motion.div>
+          )}
+        </div>
       </main>
     </div>
   );
 };
+
+// Small upgrade button component
+function UpgradeButton({ userId, userEmail }: { userId: string; userEmail?: string }) {
+  const { openCheckout, isReady } = usePaddleCheckout({ userId, userEmail });
+  return (
+    <button
+      onClick={() => openCheckout("monthly")}
+      disabled={!isReady}
+      className="w-full text-center py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
+    >
+      <Crown className="w-3.5 h-3.5 inline mr-1.5" />
+      Upgrade — $19/mo
+    </button>
+  );
+}
 
 export default Dashboard;

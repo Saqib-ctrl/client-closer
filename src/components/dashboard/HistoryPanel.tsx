@@ -23,9 +23,10 @@ interface Mockup {
 interface HistoryPanelProps {
   userId: string;
   refreshTrigger: number;
+  compact?: boolean;
 }
 
-export const HistoryPanel = ({ userId, refreshTrigger }: HistoryPanelProps) => {
+export const HistoryPanel = ({ userId, refreshTrigger, compact = false }: HistoryPanelProps) => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [mockups, setMockups] = useState<Mockup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,6 +126,9 @@ export const HistoryPanel = ({ userId, refreshTrigger }: HistoryPanelProps) => {
     );
   }
 
+  const displayProposals = compact ? proposals.slice(0, 3) : proposals;
+  const displayMockups = compact ? mockups.slice(0, 4) : mockups;
+
   return (
     <div className="space-y-8">
       {/* Proposals History */}
@@ -135,7 +139,7 @@ export const HistoryPanel = ({ userId, refreshTrigger }: HistoryPanelProps) => {
             Saved Proposals ({proposals.length})
           </h3>
           <div className="space-y-3">
-            {proposals.map((proposal) => (
+            {displayProposals.map((proposal) => (
               <div
                 key={proposal.id}
                 className="rounded-lg border border-border bg-card overflow-hidden"
@@ -198,7 +202,7 @@ export const HistoryPanel = ({ userId, refreshTrigger }: HistoryPanelProps) => {
             Saved Mockups ({mockups.length})
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {mockups.map((mockup) => (
+            {displayMockups.map((mockup) => (
               <div
                 key={mockup.id}
                 className="group relative rounded-lg border border-border overflow-hidden bg-card"
