@@ -76,19 +76,18 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.15] mb-6 tracking-tight"
         >
-          Proposals, mockups &{" "}
+          Win more clients with AI-powered{" "}
           <span className="relative">
-            <span className="text-gradient">cover letters</span>
+            <span className="text-gradient">proposals, mockups & cover letters</span>
             <motion.span
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="absolute -bottom-2 left-0 w-full h-1 bg-primary/30 rounded-full origin-left"
+              className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary/30 rounded-full origin-left"
             />
           </span>
-          {" "}in seconds.
         </motion.h1>
         
         <motion.p
