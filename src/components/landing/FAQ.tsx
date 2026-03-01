@@ -8,28 +8,28 @@ import {
 
 const faqs = [
   {
-    question: "How is this different from templates?",
-    answer: "Templates are generic and clients can spot them instantly. Propel analyzes each job description and creates unique, tailored proposals that speak directly to the client's needs, incorporating your specific portfolio and experience."
+    question: "What tools are included?",
+    answer: "Propel includes three AI-powered tools: a Proposal Generator that creates client-specific pitches, a Mockup Generator that produces professional portfolio visuals, and a Cover Letter Generator that writes tailored job applications. All three are included in every plan."
   },
   {
-    question: "Will my proposals sound authentic?",
-    answer: "Absolutely. Propel learns your writing style and voice from your portfolio. Every proposal sounds like you wrote it — because the AI is trained on your work, not generic corporate speak."
+    question: "How is this different from ChatGPT or templates?",
+    answer: "Templates are generic and ChatGPT requires careful prompting. Propel is purpose-built for freelancers — it analyzes job descriptions, integrates your portfolio, and outputs ready-to-send deliverables in the right format. No prompt engineering needed."
   },
   {
-    question: "Can I customize the output?",
-    answer: "Yes! You have full control. Edit any section, adjust the tone, add personal touches, or regenerate specific parts. Think of Propel as your first draft that's already 90% there."
+    question: "What do I get for free?",
+    answer: "Every new account gets 5 AI proposals, 5 portfolio mockups, and 3 cover letters — completely free, no credit card required. Upgrade to Pro ($19/mo) for unlimited access to all tools plus priority AI models and export features."
   },
   {
-    question: "What types of projects does this work for?",
-    answer: "Propel works for any freelance project — design, development, marketing, video editing, writing, and more. If you're pitching services to clients, Propel can help you craft the perfect proposal."
+    question: "Will my proposals and cover letters sound authentic?",
+    answer: "Yes. Propel adapts to your experience and portfolio to produce output that sounds like you wrote it. You can also choose tone (professional, friendly, creative) and edit any section before sending."
   },
   {
-    question: "Is there a free trial?",
-    answer: "Yes! Start with a 7-day free trial. No credit card required. Generate unlimited proposals and see the difference in your response rates before committing."
+    question: "What types of freelancers is this for?",
+    answer: "Propel works for designers, developers, marketers, writers, video editors, and any freelancer who pitches services to clients. If you apply for projects or jobs, Propel helps you stand out."
   },
   {
     question: "Can I cancel anytime?",
-    answer: "Of course. No long-term contracts, no hidden fees. Cancel with one click whenever you want. Your generated proposals are yours to keep forever."
+    answer: "Absolutely. No contracts, no hidden fees. Cancel with one click anytime. Your generated content is yours to keep forever, and we offer a 14-day money-back guarantee."
   }
 ];
 
@@ -48,7 +48,7 @@ const FAQ = () => {
             Questions? We've got answers.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to know about Propel.
+            Everything you need to know about Propel's AI toolkit.
           </p>
         </motion.div>
 

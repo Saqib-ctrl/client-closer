@@ -1,24 +1,24 @@
-import { FileText, Upload, Sparkles } from "lucide-react";
+import { FileText, Upload, Sparkles, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 const steps = [
   {
     icon: FileText,
     number: "01",
-    title: "Paste the job description",
-    description: "Copy the client's project brief or job posting. We'll extract exactly what they're looking for."
+    title: "Paste the job or brief",
+    description: "Drop in a job description, project brief, or job posting. Our AI extracts exactly what the client or employer needs."
   },
   {
     icon: Upload,
     number: "02",
-    title: "Add your past work",
-    description: "Upload samples or link to your portfolio. We'll match relevant projects to the client's needs."
+    title: "Add your context",
+    description: "Upload portfolio samples, paste your resume, or describe your experience. We match your strengths to their requirements."
   },
   {
     icon: Sparkles,
     number: "03",
-    title: "Get your proposal",
-    description: "Receive a personalized proposal and portfolio page tailored specifically for this client."
+    title: "Get instant deliverables",
+    description: "Receive a tailored proposal, polished mockup, or targeted cover letter — ready to send in seconds."
   }
 ];
 
@@ -34,10 +34,10 @@ const Solution = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            Three steps to a winning proposal.
+            From job post to pitch in 3 steps.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            No templates. No guesswork. Just proposals that speak directly to what your client needs.
+            Whether it's a proposal, mockup, or cover letter — the process is the same. Paste, customize, send.
           </p>
         </motion.div>
         

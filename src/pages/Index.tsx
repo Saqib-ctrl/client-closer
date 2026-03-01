@@ -3,6 +3,7 @@ import Hero from "@/components/landing/Hero";
 import LogoBar from "@/components/landing/LogoBar";
 import Problem from "@/components/landing/Problem";
 import Solution from "@/components/landing/Solution";
+import ToolsShowcase from "@/components/landing/ToolsShowcase";
 import Value from "@/components/landing/Value";
 import InteractiveDemo from "@/components/landing/InteractiveDemo";
 import Example from "@/components/landing/Example";
@@ -26,6 +27,7 @@ const Index = () => {
         <LogoBar />
         <Problem />
         <Solution />
+        <ToolsShowcase />
         <Value />
         <InteractiveDemo />
         <Example />
