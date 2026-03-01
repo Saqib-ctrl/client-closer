@@ -149,6 +149,8 @@ export type Database = {
           id: string
           ip_address: string | null
           is_premium: boolean | null
+          mockups_generated: number | null
+          mockups_limit: number | null
           proposals_generated: number | null
           proposals_limit: number | null
           updated_at: string | null
@@ -159,6 +161,8 @@ export type Database = {
           id?: string
           ip_address?: string | null
           is_premium?: boolean | null
+          mockups_generated?: number | null
+          mockups_limit?: number | null
           proposals_generated?: number | null
           proposals_limit?: number | null
           updated_at?: string | null
@@ -169,6 +173,8 @@ export type Database = {
           id?: string
           ip_address?: string | null
           is_premium?: boolean | null
+          mockups_generated?: number | null
+          mockups_limit?: number | null
           proposals_generated?: number | null
           proposals_limit?: number | null
           updated_at?: string | null
@@ -181,9 +187,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_mockup_usage_limit: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: Json
+      }
       check_usage_limit: {
         Args: { p_ip: string; p_user_id: string }
         Returns: Json
+      }
+      record_mockup_usage: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: undefined
       }
       record_proposal_usage: {
         Args: { p_ip: string; p_user_id: string }

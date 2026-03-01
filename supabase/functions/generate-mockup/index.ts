@@ -1,10 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -13,13 +14,40 @@ serve(async (req) => {
   }
 
   try {
-    const { images, stylePrompt } = await req.json();
+    const { images, stylePrompt, userId } = await req.json();
 
     if (!images || images.length === 0) {
       return new Response(
         JSON.stringify({ error: "No images provided" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Check mockup usage limit if userId provided
+    if (userId) {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                       req.headers.get("x-real-ip") || "unknown";
+
+      const { data: usageCheck, error: usageError } = await supabaseAdmin.rpc(
+        "check_mockup_usage_limit",
+        { p_user_id: userId, p_ip: clientIp }
+      );
+
+      if (usageError) {
+        console.error("Usage check error:", usageError);
+      } else if (usageCheck && !usageCheck.allowed) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Mockup generation limit reached. Upgrade to Pro for unlimited mockups.",
+            usage: usageCheck
+          }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Build the content array with images
@@ -42,7 +70,6 @@ Create the most stunning mockup presentation possible.`,
       },
     ];
 
-    // Add all images to the content
     for (const image of images) {
       content.push({
         type: "image_url",
@@ -58,12 +85,7 @@ Create the most stunning mockup presentation possible.`,
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-image-preview",
-        messages: [
-          {
-            role: "user",
-            content,
-          },
-        ],
+        messages: [{ role: "user", content }],
         modalities: ["image", "text"],
       }),
     });
@@ -92,11 +114,21 @@ Create the most stunning mockup presentation possible.`,
     const data = await response.json();
     console.log("AI response received");
 
-    // Extract the generated image from the response
     const generatedImage = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     if (!generatedImage) {
       throw new Error("No image was generated");
+    }
+
+    // Record mockup usage after successful generation
+    if (userId) {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                       req.headers.get("x-real-ip") || "unknown";
+
+      await supabaseAdmin.rpc("record_mockup_usage", { p_user_id: userId, p_ip: clientIp });
     }
 
     return new Response(
