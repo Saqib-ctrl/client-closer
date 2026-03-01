@@ -6,16 +6,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 
 const freeFeatures = [
-  "5 free proposals",
-  "AI-powered generation",
+  "5 AI proposals",
+  "5 mockup generations",
+  "3 cover letters",
   "Copy to clipboard",
   "Basic customization"
 ];
 
 const proFeatures = [
   "Unlimited proposals",
-  "Personalized portfolio pages",
-  "Client-specific customization",
+  "Unlimited mockups",
+  "Unlimited cover letters",
+  "Tone & style options",
+  "Auto-save & history",
+  "Priority AI models",
   "Export to PDF",
   "Priority support",
   "Cancel anytime"
@@ -39,35 +43,21 @@ const Pricing = () => {
         setUser({ id: session.user.id, email: session.user.email });
       }
       setIsLoadingSession(false);
-    }).catch(() => {
-      setIsLoadingSession(false);
-    });
+    }).catch(() => setIsLoadingSession(false));
   }, []);
 
-  // Only create the hook with valid userId when user is loaded
   const { openCheckout, isReady } = usePaddleCheckout({
     userId: user?.id || "",
     userEmail: user?.email
   });
 
   const handleProPlanClick = () => {
-    // If still loading session, wait
-    if (isLoadingSession) {
-      return;
-    }
-    
-    // If no user, redirect to auth
+    if (isLoadingSession) return;
     if (!user || !user.id) {
       navigate("/auth?redirect=/pricing&plan=" + (isYearly ? "yearly" : "monthly"));
       return;
     }
-    
-    // Validate that we have a proper userId before checkout
-    if (!isReady) {
-      console.log("Paddle not ready yet, waiting...");
-      return;
-    }
-    
+    if (!isReady) return;
     openCheckout(isYearly ? "yearly" : "monthly");
   };
 
@@ -82,10 +72,10 @@ const Pricing = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            Start free. Upgrade when ready.
+            Simple, transparent pricing
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Try 5 proposals free. One paying client covers the Pro cost.
+            Start free with every tool. Upgrade to Pro when you're ready for unlimited access — just $19/month.
           </p>
           
           {/* Billing Toggle */}
@@ -93,9 +83,7 @@ const Pricing = () => {
             <button
               onClick={() => setIsYearly(false)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                !isYearly 
-                  ? "bg-background shadow-sm text-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
+                !isYearly ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Monthly
@@ -103,9 +91,7 @@ const Pricing = () => {
             <button
               onClick={() => setIsYearly(true)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                isYearly 
-                  ? "bg-background shadow-sm text-foreground" 
-                  : "text-muted-foreground hover:text-foreground"
+                isYearly ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
             >
               Yearly
@@ -131,7 +117,7 @@ const Pricing = () => {
                   <span className="text-5xl font-extrabold">$0</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  5 proposals to get started
+                  Try every tool for free
                 </p>
               </div>
               
@@ -173,7 +159,6 @@ const Pricing = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="bg-card rounded-2xl p-8 card-elevated border-2 border-primary relative overflow-hidden h-full flex flex-col">
-              {/* Popular badge */}
               <div className="absolute top-4 right-4">
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold">
                   <Sparkles className="w-3 h-3" />
@@ -181,7 +166,6 @@ const Pricing = () => {
                 </span>
               </div>
               
-              {/* Glow effect */}
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl" />
               
               <div className="relative">
@@ -232,7 +216,7 @@ const Pricing = () => {
                   disabled={isLoadingSession}
                   className="btn-primary w-full group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoadingSession ? "Loading..." : "Get Unlimited Proposals"}
+                  {isLoadingSession ? "Loading..." : "Get Unlimited Access"}
                   {!isLoadingSession && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                 </motion.button>
                 

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      cover_letters: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          generated_cover_letter: string | null
+          id: string
+          job_description: string
+          job_title: string | null
+          resume_content: string | null
+          tone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          generated_cover_letter?: string | null
+          id?: string
+          job_description: string
+          job_title?: string | null
+          resume_content?: string | null
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          generated_cover_letter?: string | null
+          id?: string
+          job_description?: string
+          job_title?: string | null
+          resume_content?: string | null
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ip_usage: {
         Row: {
           first_seen_at: string | null
@@ -145,6 +184,8 @@ export type Database = {
       }
       user_usage: {
         Row: {
+          cover_letters_generated: number | null
+          cover_letters_limit: number | null
           created_at: string | null
           id: string
           ip_address: string | null
@@ -157,6 +198,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cover_letters_generated?: number | null
+          cover_letters_limit?: number | null
           created_at?: string | null
           id?: string
           ip_address?: string | null
@@ -169,6 +212,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cover_letters_generated?: number | null
+          cover_letters_limit?: number | null
           created_at?: string | null
           id?: string
           ip_address?: string | null
@@ -187,6 +232,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_cover_letter_usage_limit: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: Json
+      }
       check_mockup_usage_limit: {
         Args: { p_ip: string; p_user_id: string }
         Returns: Json
@@ -194,6 +243,10 @@ export type Database = {
       check_usage_limit: {
         Args: { p_ip: string; p_user_id: string }
         Returns: Json
+      }
+      record_cover_letter_usage: {
+        Args: { p_ip: string; p_user_id: string }
+        Returns: undefined
       }
       record_mockup_usage: {
         Args: { p_ip: string; p_user_id: string }
