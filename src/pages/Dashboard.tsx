@@ -169,6 +169,7 @@ const Dashboard = () => {
 
             <MockupGenerator 
               userId={user.id} 
+              userEmail={user.email}
               onMockupSaved={triggerHistoryRefresh} 
             />
           </TabsContent>
