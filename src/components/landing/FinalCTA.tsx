@@ -15,7 +15,6 @@ const FinalCTA = () => {
 
   return (
     <section ref={sectionRef} className="section-padding relative overflow-hidden">
-      {/* Parallax background decorations */}
       <motion.div 
         style={{ y: backgroundY }}
         className="absolute inset-0 pointer-events-none"
@@ -36,7 +35,8 @@ const FinalCTA = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
         >
-          Your next client should be easier to win.
+          Proposals. Mockups. Cover letters.{" "}
+          <span className="text-gradient">All in one place.</span>
         </motion.h2>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -45,7 +45,7 @@ const FinalCTA = () => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-lg text-muted-foreground max-w-xl mx-auto mb-10"
         >
-          Stop sending proposals that get ignored. Start closing more deals.
+          Stop spending hours on pitches. Start winning clients with AI-powered tools built for freelancers.
         </motion.p>
         
         <motion.a 
@@ -55,10 +55,10 @@ const FinalCTA = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          href="#pricing" 
+          href="/auth" 
           className="btn-primary group text-lg px-8 py-4 inline-flex items-center"
         >
-          Create my first proposal
+          Start Free — No Card Required
           <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </motion.a>
         
@@ -69,7 +69,7 @@ const FinalCTA = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-6 text-sm text-muted-foreground"
         >
-          Free to try. Takes 2 minutes.
+          5 proposals + 5 mockups + 3 cover letters free. Takes 30 seconds to sign up.
         </motion.p>
       </motion.div>
     </section>

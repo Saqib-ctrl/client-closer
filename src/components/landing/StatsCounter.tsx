@@ -1,10 +1,11 @@
-import { motion, useInView, useSpring, useTransform } from "framer-motion";
+import { motion, useInView, useSpring } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 
 const stats = [
-  { value: 12000, suffix: "+", label: "Proposals Generated" },
+  { value: 15000, suffix: "+", label: "Deliverables Generated" },
   { value: 3.2, suffix: "x", label: "Higher Response Rate", decimals: 1 },
-  { value: 2, suffix: " min", label: "Average Time Saved" }
+  { value: 2, suffix: " min", label: "Average Creation Time" },
+  { value: 3, suffix: " tools", label: "Included in Every Plan" }
 ];
 
 const AnimatedNumber = ({ 
@@ -54,7 +55,7 @@ const StatsCounter = () => {
   return (
     <section className="py-16 border-y border-border/50 bg-muted/30">
       <div className="container-wide">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -64,14 +65,14 @@ const StatsCounter = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="text-center"
             >
-              <div className="text-4xl sm:text-5xl font-extrabold text-primary mb-2">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-primary mb-2">
                 <AnimatedNumber 
                   value={stat.value} 
                   suffix={stat.suffix} 
                   decimals={stat.decimals}
                 />
               </div>
-              <p className="text-muted-foreground font-medium">{stat.label}</p>
+              <p className="text-muted-foreground font-medium text-sm">{stat.label}</p>
             </motion.div>
           ))}
         </div>

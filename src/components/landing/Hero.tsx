@@ -1,4 +1,4 @@
-import { ArrowRight, Play, Zap } from "lucide-react";
+import { ArrowRight, Play, Zap, FileText, Image, Mail } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -12,6 +12,12 @@ const Hero = () => {
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const textY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  const tools = [
+    { icon: FileText, label: "Proposals" },
+    { icon: Image, label: "Mockups" },
+    { icon: Mail, label: "Cover Letters" },
+  ];
 
   return (
     <section ref={sectionRef} className="section-padding pt-24 md:pt-32 lg:pt-40 relative overflow-hidden">
@@ -62,7 +68,7 @@ const Hero = () => {
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6"
           >
             <Zap className="w-4 h-4" />
-            5 Free Proposals — No Credit Card
+            AI-Powered Freelance Toolkit — Start Free
           </motion.span>
         </motion.div>
 
@@ -72,9 +78,9 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6"
         >
-          Win more freelance{" "}
+          Proposals, mockups &{" "}
           <span className="relative">
-            <span className="text-gradient">clients.</span>
+            <span className="text-gradient">cover letters</span>
             <motion.span
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
@@ -82,16 +88,39 @@ const Hero = () => {
               className="absolute -bottom-2 left-0 w-full h-1 bg-primary/30 rounded-full origin-left"
             />
           </span>
+          {" "}in seconds.
         </motion.h1>
         
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10"
+          className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8"
         >
-          AI-powered proposals that convert. Paste the job, get a winning pitch in seconds.
+          Three AI tools that help freelancers win more clients. Paste the job, get professional-grade deliverables instantly.
         </motion.p>
+
+        {/* Tool pills */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="flex items-center justify-center gap-3 mb-10 flex-wrap"
+        >
+          {tools.map((tool, i) => (
+            <motion.div
+              key={tool.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border/50 shadow-sm text-sm font-medium"
+            >
+              <tool.icon className="w-4 h-4 text-primary" />
+              {tool.label}
+            </motion.div>
+          ))}
+        </motion.div>
         
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -106,7 +135,7 @@ const Hero = () => {
             className="btn-primary group relative overflow-hidden shadow-lg shadow-primary/25"
           >
             <span className="relative z-10 flex items-center">
-              Get 5 Free Proposals
+              Start Free — No Card Required
               <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </motion.a>
@@ -128,13 +157,13 @@ const Hero = () => {
           className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground"
         >
           <span className="flex items-center gap-1">
-            <span className="text-green-500">✓</span> No credit card
+            <span className="text-primary">✓</span> 5 free proposals
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-green-500">✓</span> Cancel anytime
+            <span className="text-primary">✓</span> 5 free mockups
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-green-500">✓</span> 30-second setup
+            <span className="text-primary">✓</span> 3 free cover letters
           </span>
         </motion.div>
 

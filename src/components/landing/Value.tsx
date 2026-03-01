@@ -5,22 +5,22 @@ const values = [
   {
     icon: TrendingUp,
     title: "Win more clients",
-    description: "Proposals that show you understand the project get responses."
+    description: "Tailored proposals + professional mockups = higher response rates and more closed deals."
   },
   {
     icon: Clock,
-    title: "Close deals faster",
-    description: "Skip the back-and-forth. Present everything they need upfront."
+    title: "Save hours every week",
+    description: "Generate proposals, mockups, and cover letters in minutes instead of hours of manual work."
   },
   {
     icon: Target,
     title: "Stand out instantly",
-    description: "While others send generic pitches, yours speaks directly to their needs."
+    description: "While others send generic pitches and plain screenshots, yours look custom-built for every client."
   },
   {
     icon: DollarSign,
     title: "One client pays for it",
-    description: "Land one extra project and the tool pays for itself many times over."
+    description: "At $19/mo for unlimited access to all 3 tools, a single new project covers months of Propel."
   }
 ];
 
@@ -28,9 +28,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
+    transition: { staggerChildren: 0.1 }
   }
 };
 
@@ -59,7 +57,7 @@ const Value = () => {
             Outcomes, not features.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We focus on what actually matters to your freelance business.
+            Three tools working together to grow your freelance business.
           </p>
         </motion.div>
         
