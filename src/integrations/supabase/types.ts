@@ -77,6 +77,33 @@ export type Database = {
         }
         Relationships: []
       }
+      mockups: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          original_images_count: number | null
+          style_prompt: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          original_images_count?: number | null
+          style_prompt?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          original_images_count?: number | null
+          style_prompt?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
