@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   LogOut, Loader2, FileText, ImageIcon, Clock, Mail, 
   Crown, Settings, LayoutDashboard, ChevronRight, Sparkles,
-  Menu, X
+  Menu, X, Send, BookTemplate, Sun, Moon
 } from "lucide-react";
 import { User, Session } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,8 +16,11 @@ import { CoverLetterGenerator } from "@/components/dashboard/CoverLetterGenerato
 import { HistoryPanel } from "@/components/dashboard/HistoryPanel";
 import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 import { UsageOverview } from "@/components/dashboard/UsageOverview";
+import { EmailAssistant } from "@/components/dashboard/EmailAssistant";
+import { TemplatesLibrary } from "@/components/dashboard/TemplatesLibrary";
 import { toast } from "@/hooks/use-toast";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
+import { useTheme } from "next-themes";
 
 const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -87,11 +90,15 @@ const Dashboard = () => {
     );
   }
 
+  const { theme, setTheme } = useTheme();
+
   const navItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "proposal", label: "Proposals", icon: FileText },
     { id: "mockup", label: "Mockups", icon: ImageIcon },
     { id: "cover-letter", label: "Cover Letters", icon: Mail },
+    { id: "email", label: "Email Assistant", icon: Send },
+    { id: "templates", label: "Templates", icon: BookTemplate },
     { id: "history", label: "History", icon: Clock },
   ];
 
@@ -130,6 +137,13 @@ const Dashboard = () => {
         </nav>
 
         <div className="p-4 border-t border-border space-y-3">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+          >
+            {theme === "dark" ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+          </button>
           {!isPremium && (
             <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 space-y-3">
               <div className="flex items-center gap-2">
@@ -226,6 +240,8 @@ const Dashboard = () => {
                 {activeTab === "proposal" && "Generate winning freelance proposals"}
                 {activeTab === "mockup" && "Transform screenshots into stunning presentations"}
                 {activeTab === "cover-letter" && "Create personalized cover letters in seconds"}
+                {activeTab === "email" && "Generate professional emails for any situation"}
+                {activeTab === "templates" && "Save and reuse your best content"}
                 {activeTab === "history" && "View and manage your saved content"}
               </p>
             </div>
@@ -246,11 +262,12 @@ const Dashboard = () => {
               {/* Quick Actions */}
               <div>
                 <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
                     { id: "proposal", icon: FileText, title: "New Proposal", desc: "Generate a tailored proposal", color: "bg-primary/10", iconColor: "text-primary" },
                     { id: "mockup", icon: ImageIcon, title: "New Mockup", desc: "Create a beautiful presentation", color: "bg-primary/10", iconColor: "text-primary" },
                     { id: "cover-letter", icon: Mail, title: "New Cover Letter", desc: "Write a personalized letter", color: "bg-primary/10", iconColor: "text-primary" },
+                    { id: "email", icon: Send, title: "New Email", desc: "Generate professional emails", color: "bg-primary/10", iconColor: "text-primary" },
                   ].map((action) => {
                     const Icon = action.icon;
                     return (
@@ -309,6 +326,20 @@ const Dashboard = () => {
           {activeTab === "cover-letter" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <CoverLetterGenerator userId={user.id} userEmail={user.email} onCoverLetterSaved={triggerHistoryRefresh} />
+            </motion.div>
+          )}
+
+          {/* Email Tab */}
+          {activeTab === "email" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <EmailAssistant userId={user.id} userEmail={user.email} onEmailSaved={triggerHistoryRefresh} />
+            </motion.div>
+          )}
+
+          {/* Templates Tab */}
+          {activeTab === "templates" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <TemplatesLibrary userId={user.id} />
             </motion.div>
           )}
 

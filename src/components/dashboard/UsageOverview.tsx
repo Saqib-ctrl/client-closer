@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   FileText, ImageIcon, Mail, Crown, Zap, 
-  BarChart3, TrendingUp 
+  BarChart3, TrendingUp, Send
 } from "lucide-react";
 
 interface UsageOverviewProps {
@@ -15,6 +15,7 @@ interface AllUsage {
   proposals: { used: number; limit: number };
   mockups: { used: number; limit: number };
   coverLetters: { used: number; limit: number };
+  emails: { used: number; limit: number };
 }
 
 export const UsageOverview = ({ userId, isPremium }: UsageOverviewProps) => {
@@ -22,13 +23,14 @@ export const UsageOverview = ({ userId, isPremium }: UsageOverviewProps) => {
     proposals: { used: 0, limit: 5 },
     mockups: { used: 0, limit: 5 },
     coverLetters: { used: 0, limit: 3 },
+    emails: { used: 0, limit: 5 },
   });
 
   useEffect(() => {
     const fetchUsage = async () => {
       const { data } = await supabase
         .from("user_usage")
-        .select("proposals_generated, proposals_limit, mockups_generated, mockups_limit, cover_letters_generated, cover_letters_limit, is_premium")
+        .select("proposals_generated, proposals_limit, mockups_generated, mockups_limit, cover_letters_generated, cover_letters_limit, emails_generated, emails_limit, is_premium")
         .eq("user_id", userId)
         .single();
 
@@ -37,6 +39,7 @@ export const UsageOverview = ({ userId, isPremium }: UsageOverviewProps) => {
           proposals: { used: data.proposals_generated ?? 0, limit: data.proposals_limit ?? 5 },
           mockups: { used: (data as any).mockups_generated ?? 0, limit: (data as any).mockups_limit ?? 5 },
           coverLetters: { used: (data as any).cover_letters_generated ?? 0, limit: (data as any).cover_letters_limit ?? 3 },
+          emails: { used: (data as any).emails_generated ?? 0, limit: (data as any).emails_limit ?? 5 },
         });
       }
     };
@@ -68,10 +71,18 @@ export const UsageOverview = ({ userId, isPremium }: UsageOverviewProps) => {
       bgColor: "bg-primary/10",
       iconColor: "text-primary"
     },
+    { 
+      name: "Emails", 
+      icon: Send, 
+      ...usage.emails, 
+      color: "hsl(166 72% 30%)",
+      bgColor: "bg-primary/10",
+      iconColor: "text-primary"
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {tools.map((tool, i) => {
         const Icon = tool.icon;
         const percentage = isPremium ? 100 : Math.min((tool.used / tool.limit) * 100, 100);
