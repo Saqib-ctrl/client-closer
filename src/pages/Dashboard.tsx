@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   LogOut, Loader2, FileText, ImageIcon, Clock, Mail, 
-  Crown, Settings, LayoutDashboard, ChevronRight, Sparkles,
-  Menu, X, Send, BookTemplate, Sun, Moon
+  Crown, LayoutDashboard, ChevronRight, Sparkles,
+  Menu, X, Send, BookTemplate, Sun, Moon,
+  Receipt, BarChart3, Users
 } from "lucide-react";
 import { User, Session } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +18,9 @@ import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 import { UsageOverview } from "@/components/dashboard/UsageOverview";
 import { EmailAssistant } from "@/components/dashboard/EmailAssistant";
 import { TemplatesLibrary } from "@/components/dashboard/TemplatesLibrary";
+import { InvoiceGenerator } from "@/components/dashboard/InvoiceGenerator";
+import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
+import { ClientCRM } from "@/components/dashboard/ClientCRM";
 import { toast } from "@/hooks/use-toast";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 import { useTheme } from "next-themes";
@@ -98,6 +101,9 @@ const Dashboard = () => {
     { id: "mockup", label: "Mockups", icon: ImageIcon },
     { id: "cover-letter", label: "Cover Letters", icon: Mail },
     { id: "email", label: "Email Assistant", icon: Send },
+    { id: "invoices", label: "Invoices", icon: Receipt },
+    { id: "clients", label: "Clients & CRM", icon: Users },
+    { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "templates", label: "Templates", icon: BookTemplate },
     { id: "history", label: "History", icon: Clock },
   ];
@@ -241,6 +247,9 @@ const Dashboard = () => {
                 {activeTab === "mockup" && "Transform screenshots into stunning presentations"}
                 {activeTab === "cover-letter" && "Create personalized cover letters in seconds"}
                 {activeTab === "email" && "Generate professional emails for any situation"}
+                {activeTab === "invoices" && "Create and manage professional invoices"}
+                {activeTab === "clients" && "Track clients, projects, and earnings"}
+                {activeTab === "analytics" && "Visualize your usage trends and activity"}
                 {activeTab === "templates" && "Save and reuse your best content"}
                 {activeTab === "history" && "View and manage your saved content"}
               </p>
@@ -340,6 +349,27 @@ const Dashboard = () => {
           {activeTab === "templates" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <TemplatesLibrary userId={user.id} />
+            </motion.div>
+          )}
+
+          {/* Invoices Tab */}
+          {activeTab === "invoices" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <InvoiceGenerator userId={user.id} />
+            </motion.div>
+          )}
+
+          {/* Clients Tab */}
+          {activeTab === "clients" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <ClientCRM userId={user.id} />
+            </motion.div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === "analytics" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <AnalyticsDashboard userId={user.id} isPremium={isPremium} />
             </motion.div>
           )}
 
