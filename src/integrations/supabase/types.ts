@@ -224,6 +224,45 @@ export type Database = {
         }
         Relationships: []
       }
+      portfolios: {
+        Row: {
+          bio: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          sections: Json
+          slug: string
+          theme: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          sections?: Json
+          slug: string
+          theme?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          sections?: Json
+          slug?: string
+          theme?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
