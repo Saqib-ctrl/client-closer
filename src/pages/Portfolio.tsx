@@ -122,6 +122,11 @@ const Portfolio = () => {
                     transition={{ delay: 0.2 + j * 0.1 }}
                     className={`rounded-xl p-6 ${theme.card} border border-border/50 hover:shadow-lg transition-shadow`}
                   >
+                    {project.imageUrl && (
+                      <div className="w-full h-40 rounded-lg overflow-hidden mb-3 bg-black/5">
+                        <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
                     <h3 className="font-semibold text-lg mb-2">{project.title}</h3>
                     <p className={`text-sm ${theme.muted} mb-3`}>{project.description}</p>
                     {project.link && (

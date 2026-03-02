@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, GripVertical, Save, Eye, Globe, EyeOff,
   Type, Image, Briefcase, MessageSquare, Link2, ArrowUp, ArrowDown,
-  Palette, ExternalLink, Copy
+  Palette, ExternalLink, Copy, Upload, Loader2
 } from "lucide-react";
 
 export interface PortfolioSection {
@@ -18,7 +18,7 @@ export interface PortfolioSection {
   title: string;
   content: string;
   imageUrl?: string;
-  items?: { title: string; description: string; link?: string }[];
+  items?: { title: string; description: string; link?: string; imageUrl?: string }[];
 }
 
 interface Portfolio {
@@ -53,6 +53,104 @@ interface PortfolioBuilderProps {
   userEmail?: string;
 }
 
+const ImageUpload = ({
+  currentUrl,
+  onUpload,
+  userId,
+  label = "Image",
+}: {
+  currentUrl?: string;
+  onUpload: (url: string) => void;
+  userId: string;
+  label?: string;
+}) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image must be under 5MB", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const filePath = `${userId}/${crypto.randomUUID()}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from("portfolio-images")
+      .upload(filePath, file, { upsert: true });
+
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("portfolio-images")
+      .getPublicUrl(filePath);
+
+    onUpload(publicUrlData.publicUrl);
+    setUploading(false);
+    toast({ title: "Image uploaded! ✅" });
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs">{label}</Label>
+      {currentUrl && (
+        <div className="relative w-full h-32 rounded-lg overflow-hidden border border-border bg-muted">
+          <img src={currentUrl} alt="Preview" className="w-full h-full object-cover" />
+          <button
+            onClick={() => onUpload("")}
+            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs hover:opacity-80"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="flex-1"
+        >
+          {uploading ? (
+            <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+          ) : (
+            <Upload className="w-3 h-3 mr-1" />
+          )}
+          {uploading ? "Uploading..." : "Upload Image"}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleUpload}
+        />
+      </div>
+      <Input
+        value={currentUrl || ""}
+        onChange={(e) => onUpload(e.target.value)}
+        placeholder="Or paste an image URL..."
+        className="text-xs"
+      />
+    </div>
+  );
+};
+
 export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) => {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +166,7 @@ export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) =
 
   const fetchPortfolio = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("portfolios")
       .select("*")
       .eq("user_id", userId)
@@ -80,7 +178,6 @@ export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) =
         sections: (Array.isArray(data.sections) ? data.sections : []) as unknown as PortfolioSection[],
       });
     } else {
-      // Create default portfolio
       const slug = (userEmail?.split("@")[0] || "my-portfolio") + "-" + Math.random().toString(36).slice(2, 6);
       const defaultPortfolio: Omit<Portfolio, "id"> = {
         slug,
@@ -96,19 +193,17 @@ export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) =
         is_published: false,
       };
 
-      const insertData = {
-        user_id: userId,
-        slug: defaultPortfolio.slug,
-        title: defaultPortfolio.title,
-        bio: defaultPortfolio.bio,
-        theme: defaultPortfolio.theme,
-        sections: defaultPortfolio.sections as unknown as any,
-        is_published: defaultPortfolio.is_published,
-      };
-
-      const { data: created, error: createErr } = await supabase
+      const { data: created } = await supabase
         .from("portfolios")
-        .insert(insertData)
+        .insert({
+          user_id: userId,
+          slug: defaultPortfolio.slug,
+          title: defaultPortfolio.title,
+          bio: defaultPortfolio.bio,
+          theme: defaultPortfolio.theme,
+          sections: defaultPortfolio.sections as unknown as any,
+          is_published: defaultPortfolio.is_published,
+        })
         .select()
         .single();
 
@@ -194,7 +289,6 @@ export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) =
     setPortfolio({ ...portfolio, sections });
   };
 
-  // Drag and drop handlers
   const handleDragStart = (index: number) => setDragIndex(index);
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
@@ -402,62 +496,76 @@ export const PortfolioBuilder = ({ userId, userEmail }: PortfolioBuilderProps) =
                             }
                           />
                         </div>
-                        {section.type === "hero" && (
-                          <div>
-                            <Label className="text-xs">Background Image URL (optional)</Label>
-                            <Input
-                              value={section.imageUrl || ""}
-                              onChange={(e) => updateSection(section.id, { imageUrl: e.target.value })}
-                              placeholder="https://example.com/image.jpg"
-                            />
-                          </div>
+
+                        {/* Image upload for hero, about, testimonial, custom */}
+                        {["hero", "about", "testimonial", "custom"].includes(section.type) && (
+                          <ImageUpload
+                            currentUrl={section.imageUrl}
+                            onUpload={(url) => updateSection(section.id, { imageUrl: url })}
+                            userId={userId}
+                            label={section.type === "hero" ? "Background Image" : "Section Image"}
+                          />
                         )}
+
                         {section.type === "projects" && (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <Label className="text-xs">Projects</Label>
                             {(section.items || []).map((item, itemIndex) => (
-                              <div key={itemIndex} className="grid grid-cols-12 gap-2">
-                                <Input
-                                  className="col-span-4"
-                                  value={item.title}
-                                  onChange={(e) => {
+                              <div key={itemIndex} className="space-y-2 p-3 rounded-lg border border-border bg-muted/30">
+                                <div className="grid grid-cols-12 gap-2">
+                                  <Input
+                                    className="col-span-4"
+                                    value={item.title}
+                                    onChange={(e) => {
+                                      const newItems = [...(section.items || [])];
+                                      newItems[itemIndex] = { ...newItems[itemIndex], title: e.target.value };
+                                      updateSection(section.id, { items: newItems });
+                                    }}
+                                    placeholder="Project name"
+                                  />
+                                  <Input
+                                    className="col-span-4"
+                                    value={item.description}
+                                    onChange={(e) => {
+                                      const newItems = [...(section.items || [])];
+                                      newItems[itemIndex] = { ...newItems[itemIndex], description: e.target.value };
+                                      updateSection(section.id, { items: newItems });
+                                    }}
+                                    placeholder="Description"
+                                  />
+                                  <Input
+                                    className="col-span-3"
+                                    value={item.link || ""}
+                                    onChange={(e) => {
+                                      const newItems = [...(section.items || [])];
+                                      newItems[itemIndex] = { ...newItems[itemIndex], link: e.target.value };
+                                      updateSection(section.id, { items: newItems });
+                                    }}
+                                    placeholder="Link URL"
+                                  />
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="col-span-1 h-9"
+                                    onClick={() => {
+                                      const newItems = (section.items || []).filter((_, i) => i !== itemIndex);
+                                      updateSection(section.id, { items: newItems });
+                                    }}
+                                  >
+                                    <Trash2 className="w-3 h-3 text-destructive" />
+                                  </Button>
+                                </div>
+                                {/* Project screenshot upload */}
+                                <ImageUpload
+                                  currentUrl={item.imageUrl}
+                                  onUpload={(url) => {
                                     const newItems = [...(section.items || [])];
-                                    newItems[itemIndex] = { ...newItems[itemIndex], title: e.target.value };
+                                    newItems[itemIndex] = { ...newItems[itemIndex], imageUrl: url };
                                     updateSection(section.id, { items: newItems });
                                   }}
-                                  placeholder="Project name"
+                                  userId={userId}
+                                  label="Project Screenshot"
                                 />
-                                <Input
-                                  className="col-span-4"
-                                  value={item.description}
-                                  onChange={(e) => {
-                                    const newItems = [...(section.items || [])];
-                                    newItems[itemIndex] = { ...newItems[itemIndex], description: e.target.value };
-                                    updateSection(section.id, { items: newItems });
-                                  }}
-                                  placeholder="Description"
-                                />
-                                <Input
-                                  className="col-span-3"
-                                  value={item.link || ""}
-                                  onChange={(e) => {
-                                    const newItems = [...(section.items || [])];
-                                    newItems[itemIndex] = { ...newItems[itemIndex], link: e.target.value };
-                                    updateSection(section.id, { items: newItems });
-                                  }}
-                                  placeholder="Link URL"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="col-span-1 h-9"
-                                  onClick={() => {
-                                    const newItems = (section.items || []).filter((_, i) => i !== itemIndex);
-                                    updateSection(section.id, { items: newItems });
-                                  }}
-                                >
-                                  <Trash2 className="w-3 h-3 text-destructive" />
-                                </Button>
                               </div>
                             ))}
                             <Button
