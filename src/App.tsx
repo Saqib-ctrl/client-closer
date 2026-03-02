@@ -15,6 +15,7 @@ import Refund from "./pages/Refund";
 import Contact from "./pages/Contact";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/refund" element={<Refund />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/portfolio/:slug" element={<Portfolio />} />
+            <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
