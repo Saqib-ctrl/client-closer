@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cover_letters: {
         Row: {
           company_name: string | null
@@ -79,6 +115,60 @@ export type Database = {
           generated_email?: string | null
           id?: string
           subject_line?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      invoices: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          created_at: string
+          currency: string
+          due_date: string | null
+          id: string
+          invoice_number: string | null
+          items: Json
+          notes: string | null
+          status: string
+          subtotal: number
+          tax_amount: number | null
+          tax_rate: number | null
+          total: number
+          user_id: string
+        }
+        Insert: {
+          client_email?: string | null
+          client_name?: string
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          items?: Json
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number
+          user_id: string
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          created_at?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          items?: Json
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax_amount?: number | null
+          tax_rate?: number | null
+          total?: number
           user_id?: string
         }
         Relationships: []
@@ -160,6 +250,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          amount: number | null
+          client_id: string | null
+          created_at: string
+          deadline: string | null
+          id: string
+          notes: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number | null
+          client_id?: string | null
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number | null
+          client_id?: string | null
+          created_at?: string
+          deadline?: string | null
+          id?: string
+          notes?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proposals: {
         Row: {

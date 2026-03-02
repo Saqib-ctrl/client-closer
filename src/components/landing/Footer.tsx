@@ -26,7 +26,7 @@ const Footer = () => {
           </nav>
           
           <p className="text-sm text-muted-foreground">
-            © 2024 Propel. All rights reserved.
+            © 2025 Propel. All rights reserved.
           </p>
         </div>
       </div>
