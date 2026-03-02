@@ -9,7 +9,7 @@ import { UsageIndicator } from "./UsageIndicator";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 import { 
   Sparkles, Loader2, Copy, Check, FileText, Plus, Save, 
-  Briefcase, Building2, Download, BookmarkPlus
+  Briefcase, Building2, Download, BookmarkPlus, Crown
 } from "lucide-react";
 import { exportToPdf } from "@/lib/exportToPdf";
 import { saveAsTemplate } from "./TemplatesLibrary";
@@ -30,9 +30,10 @@ interface CoverLetterGeneratorProps {
   userId: string;
   userEmail?: string;
   onCoverLetterSaved?: () => void;
+  isPremium?: boolean;
 }
 
-export const CoverLetterGenerator = ({ userId, userEmail, onCoverLetterSaved }: CoverLetterGeneratorProps) => {
+export const CoverLetterGenerator = ({ userId, userEmail, onCoverLetterSaved, isPremium = false }: CoverLetterGeneratorProps) => {
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -320,11 +321,13 @@ export const CoverLetterGenerator = ({ userId, userEmail, onCoverLetterSaved }: 
                     <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.coverLetter)}>
                       {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => exportToPdf(result.coverLetter, "cover-letter.pdf")} title="Download PDF">
+                    <Button variant="ghost" size="sm" onClick={() => exportToPdf(result.coverLetter, "cover-letter.pdf")} title="Download PDF" disabled={!isPremium}>
                       <Download className="w-4 h-4" />
+                      {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => saveAsTemplate(userId, "cover-letter", `${jobTitle || "Cover Letter"} - ${companyName || ""}`.trim(), result.coverLetter, toast)} title="Save as Template">
+                    <Button variant="ghost" size="sm" onClick={() => saveAsTemplate(userId, "cover-letter", `${jobTitle || "Cover Letter"} - ${companyName || ""}`.trim(), result.coverLetter, toast)} title="Save as Template" disabled={!isPremium}>
                       <BookmarkPlus className="w-4 h-4" />
+                      {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
                     </Button>
                   </div>
                 </div>

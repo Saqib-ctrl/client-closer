@@ -315,7 +315,7 @@ const Dashboard = () => {
                     View all →
                   </button>
                 </div>
-                <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} compact />
+                <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} compact isPremium={isPremium} />
               </div>
             </motion.div>
           )}
@@ -323,7 +323,7 @@ const Dashboard = () => {
           {/* Proposal Tab */}
           {activeTab === "proposal" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <ProposalGenerator userId={user.id} onProposalSaved={triggerHistoryRefresh} />
+              <ProposalGenerator userId={user.id} onProposalSaved={triggerHistoryRefresh} isPremium={isPremium} />
             </motion.div>
           )}
 
@@ -337,28 +337,28 @@ const Dashboard = () => {
           {/* Cover Letter Tab */}
           {activeTab === "cover-letter" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <CoverLetterGenerator userId={user.id} userEmail={user.email} onCoverLetterSaved={triggerHistoryRefresh} />
+              <CoverLetterGenerator userId={user.id} userEmail={user.email} onCoverLetterSaved={triggerHistoryRefresh} isPremium={isPremium} />
             </motion.div>
           )}
 
           {/* Email Tab */}
           {activeTab === "email" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <EmailAssistant userId={user.id} userEmail={user.email} onEmailSaved={triggerHistoryRefresh} />
+              <EmailAssistant userId={user.id} userEmail={user.email} onEmailSaved={triggerHistoryRefresh} isPremium={isPremium} />
             </motion.div>
           )}
 
           {/* Templates Tab */}
           {activeTab === "templates" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <TemplatesLibrary userId={user.id} />
+              <TemplatesLibrary userId={user.id} isPremium={isPremium} />
             </motion.div>
           )}
 
           {/* Invoices Tab */}
           {activeTab === "invoices" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <InvoiceGenerator userId={user.id} />
+              <InvoiceGenerator userId={user.id} isPremium={isPremium} onInvoiceSaved={triggerHistoryRefresh} />
             </motion.div>
           )}
 
@@ -386,7 +386,7 @@ const Dashboard = () => {
           {/* History Tab */}
           {activeTab === "history" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} />
+              <HistoryPanel userId={user.id} refreshTrigger={historyRefresh} isPremium={isPremium} />
             </motion.div>
           )}
         </div>

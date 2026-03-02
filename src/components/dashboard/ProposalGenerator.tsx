@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Sparkles, Loader2, Copy, Check, FileText, Plus, Save, Download, BookmarkPlus } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check, FileText, Plus, Save, Download, BookmarkPlus, Crown } from "lucide-react";
+import { ProFeatureLock } from "./ProFeatureLock";
 import { exportToPdf } from "@/lib/exportToPdf";
 import { saveAsTemplate } from "./TemplatesLibrary";
 import { UsageIndicator } from "./UsageIndicator";
@@ -25,9 +26,10 @@ interface UsageData {
 interface ProposalGeneratorProps {
   userId: string;
   onProposalSaved?: () => void;
+  isPremium?: boolean;
 }
 
-export const ProposalGenerator = ({ userId, onProposalSaved }: ProposalGeneratorProps) => {
+export const ProposalGenerator = ({ userId, onProposalSaved, isPremium = false }: ProposalGeneratorProps) => {
   const [jobDescription, setJobDescription] = useState("");
   const [portfolioContent, setPortfolioContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -380,16 +382,20 @@ export const ProposalGenerator = ({ userId, onProposalSaved }: ProposalGenerator
                       size="sm"
                       onClick={() => exportToPdf(result.proposal, "proposal.pdf")}
                       title="Download PDF"
+                      disabled={!isPremium}
                     >
                       <Download className="w-4 h-4" />
+                      {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => saveAsTemplate(userId, "proposal", jobDescription.slice(0, 60), result.proposal, toast)}
                       title="Save as Template"
+                      disabled={!isPremium}
                     >
                       <BookmarkPlus className="w-4 h-4" />
+                      {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
                     </Button>
                   </div>
                 </div>

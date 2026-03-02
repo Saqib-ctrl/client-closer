@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { UsageIndicator } from "@/components/dashboard/UsageIndicator";
-import { Loader2, Sparkles, Copy, Check, Download, Plus, Mail } from "lucide-react";
+import { Loader2, Sparkles, Copy, Check, Download, Plus, Mail, Crown } from "lucide-react";
 import { exportToPdf } from "@/lib/exportToPdf";
 
 interface EmailResult {
@@ -21,6 +21,7 @@ interface EmailAssistantProps {
   userId: string;
   userEmail?: string;
   onEmailSaved?: () => void;
+  isPremium?: boolean;
 }
 
 const EMAIL_TYPES = [
@@ -31,7 +32,7 @@ const EMAIL_TYPES = [
   { id: "project-update", label: "Project Update", desc: "Progress reports" },
 ];
 
-export const EmailAssistant = ({ userId, userEmail, onEmailSaved }: EmailAssistantProps) => {
+export const EmailAssistant = ({ userId, userEmail, onEmailSaved, isPremium = false }: EmailAssistantProps) => {
   const [emailType, setEmailType] = useState("follow-up");
   const [context, setContext] = useState("");
   const [recipientName, setRecipientName] = useState("");
@@ -242,8 +243,9 @@ export const EmailAssistant = ({ userId, userEmail, onEmailSaved }: EmailAssista
                     <Button variant="ghost" size="sm" onClick={() => copyToClipboard(result.email)}>
                       {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => exportToPdf(result.email, `email-${emailType}.pdf`)}>
+                    <Button variant="ghost" size="sm" onClick={() => exportToPdf(result.email, `email-${emailType}.pdf`)} disabled={!isPremium}>
                       <Download className="w-4 h-4" />
+                      {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
                     </Button>
                   </div>
                 </div>
