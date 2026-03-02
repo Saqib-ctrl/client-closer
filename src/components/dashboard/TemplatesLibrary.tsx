@@ -17,9 +17,10 @@ interface Template {
 interface TemplatesLibraryProps {
   userId: string;
   onUseTemplate?: (content: string, type: string) => void;
+  isPremium?: boolean;
 }
 
-export const TemplatesLibrary = ({ userId, onUseTemplate }: TemplatesLibraryProps) => {
+export const TemplatesLibrary = ({ userId, onUseTemplate, isPremium = false }: TemplatesLibraryProps) => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");

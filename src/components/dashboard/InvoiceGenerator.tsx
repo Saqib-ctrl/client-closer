@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { exportToPdf } from "@/lib/exportToPdf";
-import { Plus, Trash2, Download, Save, FileText } from "lucide-react";
+import { Plus, Trash2, Download, Save, FileText, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface LineItem {
@@ -18,9 +18,11 @@ interface LineItem {
 
 interface InvoiceGeneratorProps {
   userId: string;
+  isPremium?: boolean;
+  onInvoiceSaved?: () => void;
 }
 
-export const InvoiceGenerator = ({ userId }: InvoiceGeneratorProps) => {
+export const InvoiceGenerator = ({ userId, isPremium = false, onInvoiceSaved }: InvoiceGeneratorProps) => {
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
@@ -79,6 +81,7 @@ export const InvoiceGenerator = ({ userId }: InvoiceGeneratorProps) => {
       });
       if (error) throw error;
       toast({ title: "Invoice saved! ✅" });
+      onInvoiceSaved?.();
     } catch (e: any) {
       toast({ title: "Error saving invoice", description: e.message, variant: "destructive" });
     } finally {
@@ -255,8 +258,9 @@ ${notes ? `Notes:\n${notes}` : ""}
         <Button onClick={saveInvoice} disabled={saving}>
           <Save className="w-4 h-4 mr-2" /> {saving ? "Saving..." : "Save Invoice"}
         </Button>
-        <Button variant="outline" onClick={downloadPdf}>
+        <Button variant="outline" onClick={downloadPdf} disabled={!isPremium}>
           <Download className="w-4 h-4 mr-2" /> Download PDF
+          {!isPremium && <Crown className="w-3 h-3 text-primary ml-1" />}
         </Button>
       </div>
     </div>
