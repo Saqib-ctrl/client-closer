@@ -9,14 +9,18 @@ const freeFeatures = [
   "5 AI proposals",
   "5 mockup generations",
   "3 cover letters",
-  "Copy to clipboard",
-  "Basic customization"
+  "5 AI emails",
+  "Invoice generator",
+  "Client CRM",
+  "1 portfolio page",
+  "Basic analytics"
 ];
 
 const proFeatures = [
-  "Unlimited proposals",
-  "Unlimited mockups",
-  "Unlimited cover letters",
+  "Unlimited proposals & mockups",
+  "Unlimited cover letters & emails",
+  "Unlimited invoices & portfolios",
+  "Full analytics dashboard",
   "Tone & style options",
   "Auto-save & history",
   "Priority AI models",

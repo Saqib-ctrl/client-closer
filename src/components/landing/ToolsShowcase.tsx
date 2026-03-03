@@ -1,4 +1,4 @@
-import { FileText, Image, Mail, ArrowRight, Sparkles, Palette, PenTool } from "lucide-react";
+import { FileText, Image, Mail, ArrowRight, Sparkles, Palette, PenTool, Receipt, Users, BarChart3, Globe, BookOpen, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -35,8 +35,8 @@ const tools = [
   },
   {
     id: "cover-letters",
-    icon: Mail,
-    accentIcon: PenTool,
+    icon: PenTool,
+    accentIcon: BookOpen,
     title: "Cover Letters",
     tagline: "Stand out in every application, every time.",
     description: "Paste the job posting and your resume to get a tailored cover letter that highlights your most relevant experience. Choose professional, friendly, or creative tone.",
@@ -47,6 +47,81 @@ const tools = [
       input: "Senior Frontend Developer at TechCorp — React, TypeScript...",
       output: "Dear Hiring Manager, I was excited to see your opening for a Senior Frontend Developer. With 6+ years building React applications..."
     }
+  },
+  {
+    id: "emails",
+    icon: Mail,
+    accentIcon: Send,
+    title: "Email Assistant",
+    tagline: "Professional emails in seconds, not minutes.",
+    description: "Generate polished client emails — follow-ups, introductions, project updates, and more. Set the tone and context, get a ready-to-send email instantly.",
+    features: ["Multiple email types", "Tone customization", "Subject line generation", "One-click copy"],
+    freeLimit: "5 free emails",
+    gradient: "from-primary/10 to-primary/5",
+    demo: {
+      input: "Follow-up email after initial meeting about website redesign...",
+      output: "Hi Sarah, It was great meeting with you yesterday to discuss the website redesign. I wanted to follow up on the key points we covered..."
+    }
+  },
+  {
+    id: "invoices",
+    icon: Receipt,
+    accentIcon: Sparkles,
+    title: "Invoice Generator",
+    tagline: "Get paid faster with professional invoices.",
+    description: "Create clean, itemized invoices with tax calculations, due dates, and client details. Export to PDF and send directly to clients.",
+    features: ["Itemized line items", "Tax calculations", "PDF export", "Client auto-fill"],
+    freeLimit: "Unlimited",
+    gradient: "from-accent/15 to-primary/5",
+    demo: {
+      input: "Client: Acme Corp — Website redesign, 3 milestones...",
+      output: "Invoice #001 | Acme Corp\nWebsite Redesign Phase 1: $2,500\nUI/UX Design: $1,800\nTotal: $4,300"
+    }
+  },
+  {
+    id: "crm",
+    icon: Users,
+    accentIcon: Sparkles,
+    title: "Client CRM",
+    tagline: "Track every client and project in one place.",
+    description: "Manage your client relationships, track projects, deadlines, and revenue. Never lose track of a lead or forget a follow-up again.",
+    features: ["Client profiles", "Project tracking", "Revenue overview", "Notes & history"],
+    freeLimit: "Included free",
+    gradient: "from-primary/20 to-accent/10",
+    demo: {
+      input: "Add client: Sarah from TechCorp, website redesign project...",
+      output: "Client added ✓\nProject: Website Redesign | Status: Active\nDeadline: March 15 | Amount: $4,300"
+    }
+  },
+  {
+    id: "portfolio",
+    icon: Globe,
+    accentIcon: Palette,
+    title: "Portfolio Builder",
+    tagline: "A shareable portfolio in minutes, not days.",
+    description: "Build a beautiful, public portfolio with drag-and-drop sections, multiple themes, and direct image uploads. Share a custom link with clients.",
+    features: ["5 professional themes", "Drag & drop sections", "Image uploads", "Public shareable link"],
+    freeLimit: "1 free portfolio",
+    gradient: "from-accent/20 to-primary/5",
+    demo: {
+      input: "Choose theme → Add sections → Upload work...",
+      output: "Portfolio live at propel.app/portfolio/your-name\n3 projects showcased with device mockups and case study descriptions."
+    }
+  },
+  {
+    id: "analytics",
+    icon: BarChart3,
+    accentIcon: Sparkles,
+    title: "Analytics Dashboard",
+    tagline: "Know your numbers. Grow your business.",
+    description: "Track your freelance metrics — proposals sent, win rates, revenue trends, and tool usage. Make data-driven decisions about your freelance business.",
+    features: ["Proposal win rates", "Revenue tracking", "Usage analytics", "Growth insights"],
+    freeLimit: "Basic analytics",
+    gradient: "from-primary/15 to-primary/5",
+    demo: {
+      input: "View dashboard for March 2026...",
+      output: "Proposals: 24 sent, 8 won (33% rate)\nRevenue: $12,400 this month (+18%)\nTop tool: AI Proposals"
+    }
   }
 ];
 
@@ -54,7 +129,7 @@ const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.2 }
+    transition: { staggerChildren: 0.1 }
   }
 };
 
@@ -97,10 +172,10 @@ const ToolsShowcase = () => {
             🛠️ Your AI toolkit
           </motion.span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            Three tools. One subscription.
+            Eight tools. One subscription.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to pitch, present, and apply — powered by AI, designed for freelancers.
+            Everything you need to pitch, present, manage, and grow — powered by AI, designed for freelancers.
           </p>
         </motion.div>
 
@@ -112,20 +187,20 @@ const ToolsShowcase = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex justify-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 p-1.5 rounded-2xl bg-muted border border-border/50">
+          <div className="inline-flex items-center gap-1 p-1.5 rounded-2xl bg-muted border border-border/50 flex-wrap justify-center max-w-3xl">
             {tools.map((tool) => (
               <motion.button
                 key={tool.id}
                 onClick={() => setActiveTab(tool.id)}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 ${
                   activeTab === tool.id
                     ? "bg-background shadow-md text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <tool.icon className="w-4 h-4" />
+                <tool.icon className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{tool.title}</span>
               </motion.button>
             ))}
@@ -229,7 +304,7 @@ const ToolsShowcase = () => {
                     <p className="text-xs font-medium text-muted-foreground mb-2 flex items-center gap-1">
                       <span className="px-1.5 py-0.5 rounded bg-green-500/10 text-green-600 text-[10px]">OUTPUT</span>
                     </p>
-                    <div className="bg-muted/50 rounded-lg p-3 border border-primary/20 text-xs leading-relaxed">
+                    <div className="bg-muted/50 rounded-lg p-3 border border-primary/20 text-xs leading-relaxed whitespace-pre-line">
                       {activeTool.demo.output}
                       <motion.span
                         animate={{ opacity: [1, 0] }}
@@ -250,7 +325,7 @@ const ToolsShowcase = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className="grid md:grid-cols-3 gap-6 mt-20"
+          className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-20"
         >
           {tools.map((tool) => (
             <motion.div
@@ -258,17 +333,17 @@ const ToolsShowcase = () => {
               variants={cardVariants}
               whileHover={{ y: -8, transition: { duration: 0.2 } }}
               onClick={() => setActiveTab(tool.id)}
-              className={`bg-card rounded-2xl p-6 border cursor-pointer transition-all duration-300 group ${
+              className={`bg-card rounded-2xl p-5 border cursor-pointer transition-all duration-300 group ${
                 activeTab === tool.id
                   ? "border-primary shadow-lg shadow-primary/10"
                   : "border-border/50 hover:border-primary/30"
               }`}
             >
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${tool.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                <tool.icon className="w-6 h-6 text-primary" />
+              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tool.gradient} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                <tool.icon className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="text-lg font-bold mb-1">{tool.title}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{tool.tagline}</p>
+              <h3 className="text-base font-bold mb-1">{tool.title}</h3>
+              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{tool.tagline}</p>
               <span className="text-xs font-medium text-primary">{tool.freeLimit} →</span>
             </motion.div>
           ))}
