@@ -6,8 +6,9 @@ import {
   LogOut, Loader2, FileText, ImageIcon, Clock, Mail, 
   Crown, LayoutDashboard, ChevronRight, Sparkles,
   Menu, X, Send, BookTemplate, Sun, Moon,
-  Receipt, BarChart3, Users, Layout
+  Receipt, BarChart3, Users, Layout, CreditCard
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { User, Session } from "@supabase/supabase-js";
 import { motion, AnimatePresence } from "framer-motion";
 import { MockupGenerator } from "@/components/dashboard/MockupGenerator";
@@ -22,6 +23,7 @@ import { InvoiceGenerator } from "@/components/dashboard/InvoiceGenerator";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
 import { ClientCRM } from "@/components/dashboard/ClientCRM";
 import { PortfolioBuilder } from "@/components/dashboard/PortfolioBuilder";
+import { SubscriptionManagement } from "@/components/dashboard/SubscriptionManagement";
 import { toast } from "@/hooks/use-toast";
 import { usePaddleCheckout } from "@/components/PaddleCheckout";
 import { useTheme } from "next-themes";
@@ -107,6 +109,7 @@ const Dashboard = () => {
     { id: "analytics", label: "Analytics", icon: BarChart3 },
     { id: "templates", label: "Templates", icon: BookTemplate },
     { id: "portfolio", label: "Portfolio", icon: Layout },
+    { id: "subscription", label: "Subscription", icon: CreditCard },
     { id: "history", label: "History", icon: Clock },
   ];
 
@@ -162,20 +165,31 @@ const Dashboard = () => {
               <UpgradeButton userId={user.id} userEmail={user.email} />
             </div>
           )}
-          <div className="flex items-center gap-3 px-2">
+          <button
+            onClick={() => setActiveTab("subscription")}
+            className="w-full flex items-center gap-3 px-2 cursor-pointer rounded-lg hover:bg-muted/50 transition-all"
+          >
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
               <span className="text-xs font-semibold text-primary">
                 {user.email?.charAt(0).toUpperCase()}
               </span>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 text-left">
               <p className="text-sm font-medium truncate">{user.email}</p>
-              <p className="text-xs text-muted-foreground">{isPremium ? "Pro Plan" : "Free Plan"}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-muted-foreground">{isPremium ? "Pro Plan" : "Free Plan"}</p>
+                {isPremium && (
+                  <Badge variant="default" className="text-[10px] px-1.5 py-0 h-4 bg-primary/90">
+                    <Crown className="w-2.5 h-2.5 mr-0.5" />
+                    PRO
+                  </Badge>
+                )}
+              </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="shrink-0">
+            <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleLogout(); }} className="shrink-0">
               <LogOut className="w-4 h-4" />
             </Button>
-          </div>
+          </button>
         </div>
       </aside>
 
@@ -380,6 +394,13 @@ const Dashboard = () => {
           {activeTab === "portfolio" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <PortfolioBuilder userId={user.id} userEmail={user.email} />
+            </motion.div>
+          )}
+
+          {/* Subscription Tab */}
+          {activeTab === "subscription" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <SubscriptionManagement userId={user.id} userEmail={user.email} isPremium={isPremium} onStatusChange={handleSubscriptionChange} />
             </motion.div>
           )}
 
