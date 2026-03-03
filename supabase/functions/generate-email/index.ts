@@ -22,16 +22,32 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Authenticate user via JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const userId = user.id; // Use authenticated user ID, NOT from request body
+
     const body = await req.json();
-    const { emailType, context, recipientName, senderName, userId } = body;
+    const { emailType, context, recipientName, senderName } = body;
 
     // Input validation
     if (!context || typeof context !== "string") {
       return new Response(JSON.stringify({ error: "Context is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
-      return new Response(JSON.stringify({ error: "Invalid user ID format" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (emailType && !VALID_EMAIL_TYPES.includes(emailType)) {
@@ -46,17 +62,12 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
-
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-    if (userId) {
-      const { data: usageCheck } = await supabaseAdmin.rpc("check_email_usage_limit", { p_user_id: userId, p_ip: clientIp });
-      if (usageCheck && !usageCheck.allowed) {
-        return new Response(JSON.stringify({ error: "Email generation limit reached", ...usageCheck }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
+    const { data: usageCheck } = await supabaseAdmin.rpc("check_email_usage_limit", { p_user_id: userId, p_ip: clientIp });
+    if (usageCheck && !usageCheck.allowed) {
+      return new Response(JSON.stringify({ error: "Email generation limit reached", ...usageCheck }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const typeInstructions: Record<string, string> = {
@@ -98,9 +109,7 @@ Context: ${sanitizedContext}`;
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
-    if (userId) {
-      await supabaseAdmin.rpc("record_email_usage", { p_user_id: userId, p_ip: clientIp });
-    }
+    await supabaseAdmin.rpc("record_email_usage", { p_user_id: userId, p_ip: clientIp });
 
     return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
   } catch (error) {
