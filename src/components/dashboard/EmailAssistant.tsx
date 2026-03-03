@@ -90,13 +90,16 @@ export const EmailAssistant = ({ userId, userEmail, onEmailSaved, isPremium = fa
       const reader = response.body!.getReader();
       const decoder = new TextDecoder();
       let fullContent = "";
+      let buffer = ""; // Buffer for incomplete SSE lines
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
-        for (const line of lines) {
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n");
+        // Keep the last part as it may be incomplete
+        buffer = parts.pop() || "";
+        for (const line of parts) {
           if (!line.startsWith("data: ")) continue;
           const jsonStr = line.slice(6).trim();
           if (jsonStr === "[DONE]") continue;
@@ -107,28 +110,51 @@ export const EmailAssistant = ({ userId, userEmail, onEmailSaved, isPremium = fa
               fullContent += content;
               setStreamedContent(fullContent);
             }
-          } catch { /* partial */ }
+          } catch { /* partial JSON chunk */ }
+        }
+      }
+      // Process any remaining buffer
+      if (buffer.startsWith("data: ")) {
+        const jsonStr = buffer.slice(6).trim();
+        if (jsonStr !== "[DONE]") {
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) fullContent += content;
+          } catch { /* ignore */ }
         }
       }
 
-      // Parse JSON result
+      // Parse JSON result from accumulated content
       const jsonMatch = fullContent.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]) as EmailResult;
-        setResult(parsed);
+        try {
+          const parsed = JSON.parse(jsonMatch[0]) as EmailResult;
+          setResult(parsed);
 
-        // Auto-save
-        await supabase.from("emails" as any).insert({
-          user_id: userId,
-          email_type: emailType,
-          context,
-          generated_email: parsed.email,
-          subject_line: parsed.subject,
-        });
+          // Auto-save
+          await supabase.from("emails" as any).insert({
+            user_id: userId,
+            email_type: emailType,
+            context,
+            generated_email: parsed.email,
+            subject_line: parsed.subject,
+          });
 
-        if (!usage.isPremium) setUsage(prev => ({ ...prev, used: prev.used + 1 }));
-        setCanGenerate(usage.isPremium || usage.used + 1 < usage.limit);
-        onEmailSaved?.();
+          if (!usage.isPremium) setUsage(prev => ({ ...prev, used: prev.used + 1 }));
+          setCanGenerate(usage.isPremium || usage.used + 1 < usage.limit);
+          onEmailSaved?.();
+        } catch (parseError) {
+          // JSON parsing failed - show raw content as fallback
+          setResult({
+            subject: "",
+            email: fullContent.replace(/```json\s*/g, "").replace(/```\s*/g, "").replace(/^\s*\{[\s\S]*\}\s*$/, fullContent),
+            tips: [],
+          });
+        }
+      } else if (fullContent.trim()) {
+        // No JSON found - display raw content
+        setResult({ subject: "", email: fullContent, tips: [] });
       }
     } catch (error) {
       toast({ title: "Generation failed", description: error instanceof Error ? error.message : "Please try again.", variant: "destructive" });
@@ -220,7 +246,7 @@ export const EmailAssistant = ({ userId, userEmail, onEmailSaved, isPremium = fa
                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
                 <span className="text-sm font-medium text-primary">Generating...</span>
               </div>
-              <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-mono">{streamedContent}</pre>
+              <pre className="whitespace-pre-wrap text-sm text-muted-foreground font-mono leading-relaxed">{streamedContent}</pre>
             </div>
           )}
 
