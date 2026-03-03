@@ -8,20 +8,48 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_JOB_DESC_LENGTH = 10000;
+const MAX_RESUME_LENGTH = 20000;
+const MAX_NAME_LENGTH = 200;
+const VALID_TONES = ["professional", "casual", "confident"];
+
+function sanitizeInput(input: string, maxLength: number): string {
+  return input
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    .trim()
+    .substring(0, maxLength);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { jobTitle, companyName, jobDescription, resumeContent, tone, userId } = await req.json();
+    const body = await req.json();
+    const { jobTitle, companyName, jobDescription, resumeContent, tone, userId } = body;
 
-    if (!jobDescription) {
+    // Input validation
+    if (!jobDescription || typeof jobDescription !== "string") {
       return new Response(
         JSON.stringify({ error: "Job description is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
+      return new Response(
+        JSON.stringify({ error: "Invalid user ID format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const sanitizedJobDesc = sanitizeInput(jobDescription, MAX_JOB_DESC_LENGTH);
+    const sanitizedJobTitle = jobTitle ? sanitizeInput(String(jobTitle), MAX_NAME_LENGTH) : undefined;
+    const sanitizedCompany = companyName ? sanitizeInput(String(companyName), MAX_NAME_LENGTH) : undefined;
+    const sanitizedResume = resumeContent ? sanitizeInput(String(resumeContent), MAX_RESUME_LENGTH) : undefined;
+    const safeTone = tone && VALID_TONES.includes(tone) ? tone : "professional";
 
     // Check usage limit
     if (userId) {
@@ -45,9 +73,9 @@ serve(async (req) => {
       }
     }
 
-    const toneInstruction = tone === "casual" 
+    const toneInstruction = safeTone === "casual" 
       ? "Use a friendly, conversational tone while remaining professional." 
-      : tone === "confident" 
+      : safeTone === "confident" 
         ? "Use a bold, confident tone that showcases achievements assertively."
         : "Use a professional, polished tone.";
 
@@ -72,10 +100,10 @@ Respond with ONLY valid JSON in this format:
   "suggestedSubject": "Email subject line suggestion"
 }`;
 
-    const userContent = `Job Title: ${jobTitle || "Not specified"}
-Company: ${companyName || "Not specified"}
-Job Description: ${jobDescription}
-${resumeContent ? `My Background/Resume: ${resumeContent}` : ""}`;
+    const userContent = `Job Title: ${sanitizedJobTitle || "Not specified"}
+Company: ${sanitizedCompany || "Not specified"}
+Job Description: ${sanitizedJobDesc}
+${sanitizedResume ? `My Background/Resume: ${sanitizedResume}` : ""}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -126,9 +154,8 @@ ${resumeContent ? `My Background/Resume: ${resumeContent}` : ""}`;
     });
   } catch (error: unknown) {
     console.error("Error in generate-cover-letter:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to generate cover letter";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An error occurred while generating the cover letter." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

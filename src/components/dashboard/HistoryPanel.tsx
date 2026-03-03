@@ -81,7 +81,19 @@ export const HistoryPanel = ({ userId, refreshTrigger, compact = false, isPremiu
 
       if (proposalsRes.error) throw proposalsRes.error;
       setProposals(proposalsRes.data || []);
-      setMockups((mockupsRes.data as unknown as Mockup[]) || []);
+      
+      // Generate signed URLs for mockups since bucket is private
+      const rawMockups = (mockupsRes.data as unknown as Mockup[]) || [];
+      const mockupsWithSignedUrls = await Promise.all(
+        rawMockups.map(async (mockup) => {
+          // If image_url is a full URL (legacy), use as-is; otherwise generate signed URL
+          if (mockup.image_url.startsWith("http")) return mockup;
+          const { data } = await supabase.storage.from("mockups").createSignedUrl(mockup.image_url, 3600);
+          return { ...mockup, image_url: data?.signedUrl || mockup.image_url };
+        })
+      );
+      setMockups(mockupsWithSignedUrls);
+      
       setCoverLetters((coverLettersRes.data as unknown as CoverLetter[]) || []);
       setEmails((emailsRes.data as unknown as Email[]) || []);
       setInvoices((invoicesRes.data as unknown as Invoice[]) || []);

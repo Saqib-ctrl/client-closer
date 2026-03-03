@@ -8,20 +8,59 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_STYLE_PROMPT_LENGTH = 2000;
+const MAX_IMAGES = 5;
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB base64
+
+function sanitizeInput(input: string, maxLength: number): string {
+  return input
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    .trim()
+    .substring(0, maxLength);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { images, stylePrompt, userId } = await req.json();
+    const body = await req.json();
+    const { images, stylePrompt, userId } = body;
 
-    if (!images || images.length === 0) {
+    // Input validation
+    if (!images || !Array.isArray(images) || images.length === 0) {
       return new Response(
         JSON.stringify({ error: "No images provided" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    if (images.length > MAX_IMAGES) {
+      return new Response(
+        JSON.stringify({ error: `Maximum ${MAX_IMAGES} images allowed` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    for (const img of images) {
+      if (typeof img !== "string" || img.length > MAX_IMAGE_SIZE) {
+        return new Response(
+          JSON.stringify({ error: "Invalid or oversized image data" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
+      return new Response(
+        JSON.stringify({ error: "Invalid user ID format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const sanitizedStylePrompt = stylePrompt ? sanitizeInput(String(stylePrompt), MAX_STYLE_PROMPT_LENGTH) : undefined;
 
     // Check mockup usage limit if userId provided
     if (userId) {
@@ -56,7 +95,7 @@ serve(async (req) => {
         type: "text",
         text: `You are a professional designer. Create a beautiful, polished mockup presentation for the following screenshot(s). 
         
-Style instructions: ${stylePrompt || "Modern, professional mockup with elegant shadows, subtle gradients, and a clean presentation style suitable for a portfolio or pitch deck."}
+Style instructions: ${sanitizedStylePrompt || "Modern, professional mockup with elegant shadows, subtle gradients, and a clean presentation style suitable for a portfolio or pitch deck."}
 
 Guidelines:
 - Place the screenshot(s) in realistic device frames (laptop, phone, tablet) or floating windows
@@ -112,7 +151,6 @@ Create the most stunning mockup presentation possible.`,
     }
 
     const data = await response.json();
-    console.log("AI response received");
 
     const generatedImage = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
@@ -140,9 +178,8 @@ Create the most stunning mockup presentation possible.`,
     );
   } catch (error: unknown) {
     console.error("Error in generate-mockup:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to generate mockup";
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An error occurred while generating the mockup." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
