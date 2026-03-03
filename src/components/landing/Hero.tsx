@@ -1,4 +1,4 @@
-import { ArrowRight, Play, Zap, FileText, Image, Mail } from "lucide-react";
+import { ArrowRight, Play, Zap, FileText, Image, Mail, Receipt, Users, BarChart3, Globe, PenTool } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
@@ -16,7 +16,12 @@ const Hero = () => {
   const tools = [
     { icon: FileText, label: "Proposals" },
     { icon: Image, label: "Mockups" },
-    { icon: Mail, label: "Cover Letters" },
+    { icon: PenTool, label: "Cover Letters" },
+    { icon: Mail, label: "Emails" },
+    { icon: Receipt, label: "Invoices" },
+    { icon: Users, label: "Client CRM" },
+    { icon: Globe, label: "Portfolio" },
+    { icon: BarChart3, label: "Analytics" },
   ];
 
   return (
@@ -78,9 +83,9 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
           className="text-3xl sm:text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-[1.15] mb-6 tracking-tight"
         >
-          Win more clients with AI-powered{" "}
+          The all-in-one AI toolkit for{" "}
           <span className="relative">
-            <span className="text-gradient">proposals, mockups & cover letters</span>
+            <span className="text-gradient">freelancers who want to win</span>
             <motion.span
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
@@ -96,7 +101,7 @@ const Hero = () => {
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
           className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8"
         >
-          Three AI tools that help freelancers win more clients. Paste the job, get professional-grade deliverables instantly.
+          Proposals, mockups, cover letters, emails, invoices, CRM, portfolio & analytics — all AI-powered, all in one place.
         </motion.p>
 
         {/* Tool pills */}
@@ -156,13 +161,13 @@ const Hero = () => {
           className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground"
         >
           <span className="flex items-center gap-1">
-            <span className="text-primary">✓</span> 5 free proposals
+            <span className="text-primary">✓</span> 8 AI tools included
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-primary">✓</span> 5 free mockups
+            <span className="text-primary">✓</span> No credit card
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-primary">✓</span> 3 free cover letters
+            <span className="text-primary">✓</span> Free tier forever
           </span>
         </motion.div>
 

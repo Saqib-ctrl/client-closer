@@ -2,54 +2,16 @@ import { Check, X, Minus } from "lucide-react";
 import { motion } from "framer-motion";
 
 const features = [
-  {
-    name: "Personalized proposals",
-    propel: true,
-    templates: false,
-    manual: "partial"
-  },
-  {
-    name: "Time to create",
-    propel: "2 minutes",
-    templates: "15-30 min",
-    manual: "1-2 hours"
-  },
-  {
-    name: "Portfolio integration",
-    propel: true,
-    templates: false,
-    manual: "partial"
-  },
-  {
-    name: "Client-specific value props",
-    propel: true,
-    templates: false,
-    manual: true
-  },
-  {
-    name: "Professional formatting",
-    propel: true,
-    templates: true,
-    manual: "partial"
-  },
-  {
-    name: "AI-powered insights",
-    propel: true,
-    templates: false,
-    manual: false
-  },
-  {
-    name: "Scalable for volume",
-    propel: true,
-    templates: "partial",
-    manual: false
-  },
-  {
-    name: "Consistency across proposals",
-    propel: true,
-    templates: true,
-    manual: false
-  }
+  { name: "AI proposals", propel: true, diy: false, other: "partial" },
+  { name: "Portfolio mockups", propel: true, diy: false, other: false },
+  { name: "Cover letters", propel: true, diy: false, other: "partial" },
+  { name: "Email assistant", propel: true, diy: false, other: false },
+  { name: "Invoice generator", propel: true, diy: "partial", other: false },
+  { name: "Client CRM", propel: true, diy: "partial", other: true },
+  { name: "Portfolio builder", propel: true, diy: false, other: true },
+  { name: "Analytics dashboard", propel: true, diy: false, other: "partial" },
+  { name: "Time to create", propel: "2 min", diy: "1-2 hrs", other: "15-30 min" },
+  { name: "All-in-one platform", propel: true, diy: false, other: false },
 ];
 
 const renderValue = (value: boolean | string) => {
@@ -77,32 +39,16 @@ const renderValue = (value: boolean | string) => {
   return <span className="text-sm text-muted-foreground">{value}</span>;
 };
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05
-    }
-  }
-};
-
 const rowVariants = {
   hidden: { opacity: 0, x: -20 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: { duration: 0.4, ease: "easeOut" as const }
-  }
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "easeOut" as const } }
 };
 
 const ComparisonTable = () => {
   return (
     <section className="section-padding bg-muted/30 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-primary/3 rounded-full blur-3xl" />
       </div>
 
       <div className="container-wide relative z-10">
@@ -117,7 +63,7 @@ const ComparisonTable = () => {
             Why Propel wins
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See how Propel compares to traditional approaches for creating proposals.
+            Compare the full toolkit against doing it yourself or using separate tools.
           </p>
         </motion.div>
 
@@ -129,37 +75,26 @@ const ComparisonTable = () => {
           className="overflow-x-auto"
         >
           <div className="min-w-[600px]">
-            {/* Header */}
             <div className="grid grid-cols-4 gap-4 mb-4">
-              <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Feature
-              </div>
+              <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Feature</div>
               <div className="text-center">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="inline-block px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold"
-                >
+                <motion.div whileHover={{ scale: 1.02 }} className="inline-block px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold">
                   Propel
                 </motion.div>
               </div>
               <div className="text-center">
-                <div className="inline-block px-4 py-2 rounded-xl bg-muted font-medium">
-                  Templates
-                </div>
+                <div className="inline-block px-4 py-2 rounded-xl bg-muted font-medium">DIY</div>
               </div>
               <div className="text-center">
-                <div className="inline-block px-4 py-2 rounded-xl bg-muted font-medium">
-                  Manual
-                </div>
+                <div className="inline-block px-4 py-2 rounded-xl bg-muted font-medium">Other Tools</div>
               </div>
             </div>
 
-            {/* Rows */}
             <motion.div
-              variants={containerVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-50px" }}
+              transition={{ staggerChildren: 0.05 }}
               className="space-y-2"
             >
               {features.map((feature, index) => (
@@ -172,15 +107,14 @@ const ComparisonTable = () => {
                 >
                   <div className="font-medium">{feature.name}</div>
                   <div className="flex justify-center">{renderValue(feature.propel)}</div>
-                  <div className="flex justify-center">{renderValue(feature.templates)}</div>
-                  <div className="flex justify-center">{renderValue(feature.manual)}</div>
+                  <div className="flex justify-center">{renderValue(feature.diy)}</div>
+                  <div className="flex justify-center">{renderValue(feature.other)}</div>
                 </motion.div>
               ))}
             </motion.div>
           </div>
         </motion.div>
 
-        {/* Bottom CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -188,9 +122,7 @@ const ComparisonTable = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-10"
         >
-          <p className="text-muted-foreground mb-4">
-            Ready to upgrade your proposal game?
-          </p>
+          <p className="text-muted-foreground mb-4">Ready to upgrade your freelance game?</p>
           <motion.a
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
