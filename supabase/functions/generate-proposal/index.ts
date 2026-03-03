@@ -23,8 +23,32 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate user via JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const userId = user.id; // Use authenticated user ID
+
     const body = await req.json();
-    const { jobDescription, portfolioContent, userId } = body;
+    const { jobDescription, portfolioContent } = body;
 
     // Input validation
     if (!jobDescription || typeof jobDescription !== "string") {
@@ -33,19 +57,10 @@ serve(async (req) => {
       });
     }
 
-    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
-      return new Response(JSON.stringify({ error: "Invalid user ID format" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const sanitizedJobDesc = sanitizeInput(jobDescription, MAX_JOB_DESC_LENGTH);
     const sanitizedPortfolio = portfolioContent ? sanitizeInput(String(portfolioContent), MAX_PORTFOLIO_LENGTH) : null;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
@@ -55,25 +70,23 @@ serve(async (req) => {
                      "unknown";
 
     // Check usage limits
-    if (userId && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      
-      const { data: usageCheck, error: usageError } = await supabaseAdmin
-        .rpc("check_usage_limit", { p_user_id: userId, p_ip: clientIP });
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    
+    const { data: usageCheck, error: usageError } = await supabaseAdmin
+      .rpc("check_usage_limit", { p_user_id: userId, p_ip: clientIP });
 
-      if (usageError) {
-        console.error("Error checking usage:", usageError);
-      } else if (usageCheck && !usageCheck.allowed) {
-        return new Response(JSON.stringify({ 
-          error: usageCheck.message || "Usage limit reached",
-          reason: usageCheck.reason,
-          used: usageCheck.used,
-          limit: usageCheck.limit
-        }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    if (usageError) {
+      console.error("Error checking usage:", usageError);
+    } else if (usageCheck && !usageCheck.allowed) {
+      return new Response(JSON.stringify({ 
+        error: usageCheck.message || "Usage limit reached",
+        reason: usageCheck.reason,
+        used: usageCheck.used,
+        limit: usageCheck.limit
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const systemPrompt = `You are an expert freelance proposal writer. Your job is to create compelling, personalized proposals that win clients.
@@ -136,15 +149,11 @@ Return your response in the following JSON format:
     }
 
     // Record usage after successful generation
-    if (userId && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-      
-      const { error: recordError } = await supabaseAdmin
-        .rpc("record_proposal_usage", { p_user_id: userId, p_ip: clientIP });
+    const { error: recordError } = await supabaseAdmin
+      .rpc("record_proposal_usage", { p_user_id: userId, p_ip: clientIP });
 
-      if (recordError) {
-        console.error("Error recording usage:", recordError);
-      }
+    if (recordError) {
+      console.error("Error recording usage:", recordError);
     }
 
     return new Response(response.body, {

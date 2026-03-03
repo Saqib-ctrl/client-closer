@@ -8,7 +8,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_STYLE_PROMPT_LENGTH = 2000;
 const MAX_IMAGES = 5;
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB base64
@@ -26,8 +25,34 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate user via JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = user.id; // Use authenticated user ID
+
     const body = await req.json();
-    const { images, stylePrompt, userId } = body;
+    const { images, stylePrompt } = body;
 
     // Input validation
     if (!images || !Array.isArray(images) || images.length === 0) {
@@ -53,40 +78,28 @@ serve(async (req) => {
       }
     }
 
-    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
-      return new Response(
-        JSON.stringify({ error: "Invalid user ID format" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const sanitizedStylePrompt = stylePrompt ? sanitizeInput(String(stylePrompt), MAX_STYLE_PROMPT_LENGTH) : undefined;
 
-    // Check mockup usage limit if userId provided
-    if (userId) {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    // Check mockup usage limit
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("x-real-ip") || "unknown";
 
-      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
-                       req.headers.get("x-real-ip") || "unknown";
+    const { data: usageCheck, error: usageError } = await supabaseAdmin.rpc(
+      "check_mockup_usage_limit",
+      { p_user_id: userId, p_ip: clientIp }
+    );
 
-      const { data: usageCheck, error: usageError } = await supabaseAdmin.rpc(
-        "check_mockup_usage_limit",
-        { p_user_id: userId, p_ip: clientIp }
+    if (usageError) {
+      console.error("Usage check error:", usageError);
+    } else if (usageCheck && !usageCheck.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Mockup generation limit reached. Upgrade to Pro for unlimited mockups.",
+          usage: usageCheck
+        }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-
-      if (usageError) {
-        console.error("Usage check error:", usageError);
-      } else if (usageCheck && !usageCheck.allowed) {
-        return new Response(
-          JSON.stringify({ 
-            error: "Mockup generation limit reached. Upgrade to Pro for unlimited mockups.",
-            usage: usageCheck
-          }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
     }
 
     // Build the content array with images
@@ -159,15 +172,7 @@ Create the most stunning mockup presentation possible.`,
     }
 
     // Record mockup usage after successful generation
-    if (userId) {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
-                       req.headers.get("x-real-ip") || "unknown";
-
-      await supabaseAdmin.rpc("record_mockup_usage", { p_user_id: userId, p_ip: clientIp });
-    }
+    await supabaseAdmin.rpc("record_mockup_usage", { p_user_id: userId, p_ip: clientIp });
 
     return new Response(
       JSON.stringify({ 

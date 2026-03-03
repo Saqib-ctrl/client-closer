@@ -101,6 +101,9 @@ export const ProposalGenerator = ({ userId, onProposalSaved, isPremium = false }
     try {
       // Get current session for auth token
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error("Please log in to generate proposals.");
+      }
       
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-proposal`,
@@ -108,9 +111,9 @@ export const ProposalGenerator = ({ userId, onProposalSaved, isPremium = false }
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ jobDescription, portfolioContent, userId }),
+          body: JSON.stringify({ jobDescription, portfolioContent }),
         }
       );
 

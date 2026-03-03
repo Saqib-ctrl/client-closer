@@ -8,7 +8,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_JOB_DESC_LENGTH = 10000;
 const MAX_RESUME_LENGTH = 20000;
 const MAX_NAME_LENGTH = 200;
@@ -27,20 +26,39 @@ serve(async (req) => {
   }
 
   try {
+    // Authenticate user via JWT
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = user.id; // Use authenticated user ID
+
     const body = await req.json();
-    const { jobTitle, companyName, jobDescription, resumeContent, tone, userId } = body;
+    const { jobTitle, companyName, jobDescription, resumeContent, tone } = body;
 
     // Input validation
     if (!jobDescription || typeof jobDescription !== "string") {
       return new Response(
         JSON.stringify({ error: "Job description is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
-      return new Response(
-        JSON.stringify({ error: "Invalid user ID format" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -52,25 +70,21 @@ serve(async (req) => {
     const safeTone = tone && VALID_TONES.includes(tone) ? tone : "professional";
 
     // Check usage limit
-    if (userId) {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-      const { data: usageCheck, error: usageError } = await supabaseAdmin.rpc(
-        "check_cover_letter_usage_limit",
-        { p_user_id: userId, p_ip: clientIp }
+    const { data: usageCheck, error: usageError } = await supabaseAdmin.rpc(
+      "check_cover_letter_usage_limit",
+      { p_user_id: userId, p_ip: clientIp }
+    );
+
+    if (usageError) {
+      console.error("Usage check error:", usageError);
+    } else if (usageCheck && !usageCheck.allowed) {
+      return new Response(
+        JSON.stringify({ error: "Cover letter limit reached. Upgrade to Pro for unlimited access.", usage: usageCheck }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-
-      if (usageError) {
-        console.error("Usage check error:", usageError);
-      } else if (usageCheck && !usageCheck.allowed) {
-        return new Response(
-          JSON.stringify({ error: "Cover letter limit reached. Upgrade to Pro for unlimited access.", usage: usageCheck }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
     }
 
     const toneInstruction = safeTone === "casual" 
@@ -135,13 +149,7 @@ ${sanitizedResume ? `My Background/Resume: ${sanitizedResume}` : ""}`;
     }
 
     // Record usage after successful generation
-    if (userId) {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-      const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-      await supabaseAdmin.rpc("record_cover_letter_usage", { p_user_id: userId, p_ip: clientIp });
-    }
+    await supabaseAdmin.rpc("record_cover_letter_usage", { p_user_id: userId, p_ip: clientIp });
 
     // Stream the response back
     return new Response(response.body, {
