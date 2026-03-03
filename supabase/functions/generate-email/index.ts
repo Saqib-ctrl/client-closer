@@ -6,15 +6,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_CONTEXT_LENGTH = 10000;
+const MAX_NAME_LENGTH = 200;
+const VALID_EMAIL_TYPES = ["follow-up", "negotiation", "thank-you", "cold-outreach", "project-update"];
+
+function sanitizeInput(input: string, maxLength: number): string {
+  return input
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    .trim()
+    .substring(0, maxLength);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { emailType, context, recipientName, senderName, userId } = await req.json();
+    const body = await req.json();
+    const { emailType, context, recipientName, senderName, userId } = body;
 
-    if (!context) {
+    // Input validation
+    if (!context || typeof context !== "string") {
       return new Response(JSON.stringify({ error: "Context is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+
+    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
+      return new Response(JSON.stringify({ error: "Invalid user ID format" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    if (emailType && !VALID_EMAIL_TYPES.includes(emailType)) {
+      return new Response(JSON.stringify({ error: "Invalid email type" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const sanitizedContext = sanitizeInput(context, MAX_CONTEXT_LENGTH);
+    const sanitizedRecipientName = recipientName ? sanitizeInput(String(recipientName), MAX_NAME_LENGTH) : undefined;
+    const sanitizedSenderName = senderName ? sanitizeInput(String(senderName), MAX_NAME_LENGTH) : undefined;
+    const safeEmailType = emailType && VALID_EMAIL_TYPES.includes(emailType) ? emailType : "follow-up";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -41,7 +68,7 @@ serve(async (req) => {
     };
 
     const systemPrompt = `You are an expert email writer for freelancers and professionals. 
-${typeInstructions[emailType] || typeInstructions["follow-up"]}
+${typeInstructions[safeEmailType] || typeInstructions["follow-up"]}
 
 IMPORTANT: Return your response as valid JSON with this exact structure:
 {
@@ -50,10 +77,10 @@ IMPORTANT: Return your response as valid JSON with this exact structure:
   "tips": ["tip 1", "tip 2"]
 }`;
 
-    const userContent = `Email type: ${emailType}
-${recipientName ? `Recipient: ${recipientName}` : ""}
-${senderName ? `Sender: ${senderName}` : ""}
-Context: ${context}`;
+    const userContent = `Email type: ${safeEmailType}
+${sanitizedRecipientName ? `Recipient: ${sanitizedRecipientName}` : ""}
+${sanitizedSenderName ? `Sender: ${sanitizedSenderName}` : ""}
+Context: ${sanitizedContext}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,6 +105,6 @@ Context: ${context}`;
     return new Response(response.body, { headers: { ...corsHeaders, "Content-Type": "text/event-stream" } });
   } catch (error) {
     console.error("generate-email error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ error: "An error occurred while generating the email." }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });

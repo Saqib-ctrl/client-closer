@@ -186,12 +186,10 @@ export const MockupGenerator = ({ userId, userEmail, onMockupSaved }: MockupGene
         .from("mockups" as any)
         .upload(fileName, blob);
       if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage
-        .from("mockups" as any)
-        .getPublicUrl(fileName);
+      // Store the file path (not public URL) since bucket is private
       const { error: dbError } = await supabase.from("mockups" as any).insert({
         user_id: userId,
-        image_url: urlData.publicUrl,
+        image_url: fileName,
         style_prompt: stylePrompt || null,
         original_images_count: uploadedImages.length,
       });

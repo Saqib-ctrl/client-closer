@@ -6,13 +6,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const MAX_JOB_DESC_LENGTH = 15000;
+const MAX_PORTFOLIO_LENGTH = 20000;
+
+function sanitizeInput(input: string, maxLength: number): string {
+  return input
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    .trim()
+    .substring(0, maxLength);
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { jobDescription, portfolioContent, userId } = await req.json();
+    const body = await req.json();
+    const { jobDescription, portfolioContent, userId } = body;
+
+    // Input validation
+    if (!jobDescription || typeof jobDescription !== "string") {
+      return new Response(JSON.stringify({ error: "Job description is required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (userId && (typeof userId !== "string" || !UUID_REGEX.test(userId))) {
+      return new Response(JSON.stringify({ error: "Invalid user ID format" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const sanitizedJobDesc = sanitizeInput(jobDescription, MAX_JOB_DESC_LENGTH);
+    const sanitizedPortfolio = portfolioContent ? sanitizeInput(String(portfolioContent), MAX_PORTFOLIO_LENGTH) : null;
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -21,14 +50,11 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Get client IP from headers
     const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
                      req.headers.get("x-real-ip") || 
                      "unknown";
 
-    console.log(`Proposal request from user: ${userId}, IP: ${clientIP}`);
-
-    // Check usage limits using service role (bypasses RLS)
+    // Check usage limits
     if (userId && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
       
@@ -38,7 +64,6 @@ serve(async (req) => {
       if (usageError) {
         console.error("Error checking usage:", usageError);
       } else if (usageCheck && !usageCheck.allowed) {
-        console.log(`Usage denied for user ${userId}: ${usageCheck.reason}`);
         return new Response(JSON.stringify({ 
           error: usageCheck.message || "Usage limit reached",
           reason: usageCheck.reason,
@@ -85,7 +110,7 @@ Return your response in the following JSON format:
           { role: "system", content: systemPrompt },
           { 
             role: "user", 
-            content: `Job Description:\n${jobDescription}\n\nMy Portfolio/Past Work:\n${portfolioContent || "No portfolio content provided - create a general proposal based on the job description."}` 
+            content: `Job Description:\n${sanitizedJobDesc}\n\nMy Portfolio/Past Work:\n${sanitizedPortfolio || "No portfolio content provided - create a general proposal based on the job description."}` 
           },
         ],
         stream: true,
@@ -95,21 +120,18 @@ Return your response in the following JSON format:
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Usage limit reached. Please add credits to continue." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       return new Response(JSON.stringify({ error: "Failed to generate proposal" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -122,8 +144,6 @@ Return your response in the following JSON format:
 
       if (recordError) {
         console.error("Error recording usage:", recordError);
-      } else {
-        console.log(`Usage recorded for user ${userId}`);
       }
     }
 
@@ -132,7 +152,7 @@ Return your response in the following JSON format:
     });
   } catch (error) {
     console.error("Error in generate-proposal:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An error occurred while generating the proposal." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
