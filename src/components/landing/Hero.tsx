@@ -194,7 +194,7 @@ const Hero = () => {
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">500+</span> freelancers winning clients
+              <span className="font-semibold text-foreground">Join</span> freelancers winning more clients
             </p>
           </motion.div>
         </motion.div>

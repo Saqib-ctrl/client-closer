@@ -35,8 +35,8 @@ const FinalCTA = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6"
         >
-          Proposals. Mockups. Cover letters.{" "}
-          <span className="text-gradient">All in one place.</span>
+          Proposals. Mockups. Emails. Invoices.{" "}
+          <span className="text-gradient">All in one toolkit.</span>
         </motion.h2>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -69,7 +69,7 @@ const FinalCTA = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-6 text-sm text-muted-foreground"
         >
-          5 proposals + 5 mockups + 3 cover letters free. Takes 30 seconds to sign up.
+          8 AI tools free. No credit card. Takes 30 seconds to sign up.
         </motion.p>
       </motion.div>
     </section>

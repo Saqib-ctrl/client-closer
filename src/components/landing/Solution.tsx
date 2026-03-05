@@ -18,7 +18,7 @@ const steps = [
     icon: Sparkles,
     number: "03",
     title: "Get instant deliverables",
-    description: "Receive a tailored proposal, polished mockup, or targeted cover letter — ready to send in seconds."
+    description: "Receive a tailored proposal, polished mockup, targeted cover letter, professional email, or invoice — ready to send in seconds."
   }
 ];
 
@@ -37,7 +37,7 @@ const Solution = () => {
             From job post to pitch in 3 steps.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Whether it's a proposal, mockup, or cover letter — the process is the same. Paste, customize, send.
+            Whether it's a proposal, mockup, cover letter, email, or invoice — the process is the same. Paste, customize, send.
           </p>
         </motion.div>
         
