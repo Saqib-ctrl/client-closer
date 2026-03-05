@@ -11,6 +11,9 @@ const Footer = () => {
           </div>
           
           <nav className="flex items-center gap-6">
+            <a href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              About
+            </a>
             <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy
             </a>
@@ -26,7 +29,7 @@ const Footer = () => {
           </nav>
           
           <p className="text-sm text-muted-foreground">
-            © 2025 Propel. All rights reserved.
+            © 2026 Propel. All rights reserved.
           </p>
         </div>
       </div>

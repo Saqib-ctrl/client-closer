@@ -256,10 +256,24 @@ const Admin = () => {
               })}
             </div>
 
-            {/* Conversion rate */}
+            {/* Business Metrics */}
             <div className="rounded-xl border border-border bg-card p-6">
-              <h3 className="font-semibold mb-4">Key Metrics</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <h3 className="font-semibold mb-4">Business Metrics</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-sm text-muted-foreground">Estimated MRR</p>
+                  <p className="text-3xl font-bold text-primary">
+                    ${stats ? (stats.premiumUsers * 19).toLocaleString() : 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Pro users × $19/mo</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Estimated ARR</p>
+                  <p className="text-3xl font-bold">
+                    ${stats ? (stats.premiumUsers * 19 * 12).toLocaleString() : 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Projected annual revenue</p>
+                </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Conversion Rate</p>
                   <p className="text-3xl font-bold text-primary">
@@ -279,6 +293,13 @@ const Admin = () => {
                   </p>
                   <p className="text-xs text-muted-foreground">Generations per user</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Platform Health */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h3 className="font-semibold mb-4">Platform Health</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div>
                   <p className="text-sm text-muted-foreground">Total Generations</p>
                   <p className="text-3xl font-bold">
@@ -287,6 +308,20 @@ const Admin = () => {
                       : 0}
                   </p>
                   <p className="text-xs text-muted-foreground">All tools combined</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Revenue per User</p>
+                  <p className="text-3xl font-bold">
+                    ${stats && stats.totalUsers > 0 ? ((stats.premiumUsers * 19) / stats.totalUsers).toFixed(2) : "0.00"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">ARPU (monthly)</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Free Users</p>
+                  <p className="text-3xl font-bold">
+                    {stats ? stats.totalUsers - stats.premiumUsers : 0}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Conversion opportunity</p>
                 </div>
               </div>
             </div>

@@ -4,16 +4,16 @@ import { useRef } from "react";
 
 const problems = [
   {
-    title: "Generic proposals",
-    description: "Copy-paste templates that don't speak to what the client actually needs."
+    title: "Generic proposals & emails",
+    description: "Copy-paste templates that don't speak to what the client actually needs — killing your response rate."
   },
   {
-    title: "Unclear portfolio",
-    description: "Past work buried in folders, not presented in a way clients can quickly evaluate."
+    title: "Scattered workflow",
+    description: "Juggling separate tools for proposals, invoices, CRM, and portfolio — wasting hours every week."
   },
   {
     title: "No visible value",
-    description: "Clients can't immediately see why you're the right choice for their specific project."
+    description: "Clients can't immediately see why you're the right choice when your pitch lacks mockups, context, and polish."
   }
 ];
 

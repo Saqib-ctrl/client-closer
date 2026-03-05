@@ -5,7 +5,7 @@ const stats = [
   { value: 15000, suffix: "+", label: "Deliverables Generated" },
   { value: 3.2, suffix: "x", label: "Higher Response Rate", decimals: 1 },
   { value: 2, suffix: " min", label: "Average Creation Time" },
-  { value: 3, suffix: " tools", label: "Included in Every Plan" }
+  { value: 8, suffix: " tools", label: "Included in Every Plan" }
 ];
 
 const AnimatedNumber = ({ 

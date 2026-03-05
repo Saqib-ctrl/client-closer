@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+# Propel — AI-Powered Freelance Toolkit
 
-## Project info
+Propel is a full-stack SaaS platform that gives freelancers 8 AI-powered tools to win more clients. It consolidates proposal writing, mockup generation, cover letters, email drafting, invoicing, CRM, portfolio building, and analytics into a single dashboard.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Product Overview
 
-## How can I edit this code?
+| Metric | Detail |
+|--------|--------|
+| **Model** | Freemium SaaS (Free tier + $19/mo Pro) |
+| **Billing** | Paddle (subscriptions, webhooks) |
+| **Auth** | Email/password via Supabase Auth |
+| **AI** | LLM-powered content generation |
+| **Users** | Freelancers, consultants, agencies |
 
-There are several ways of editing your application.
+## 🛠 Tech Stack
 
-**Use Lovable**
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, TypeScript, Vite |
+| Styling | Tailwind CSS, shadcn/ui, Framer Motion |
+| Backend | Supabase (Postgres, Auth, Edge Functions, RLS) |
+| Payments | Paddle (subscriptions, webhooks) |
+| Hosting | Lovable (preview + production) |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 📦 Features (8 AI Tools)
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Proposal Generator** — Paste a job description, get a tailored client proposal
+2. **Mockup Generator** — Upload reference images, get AI-generated visual mockups
+3. **Cover Letter Writer** — Targeted cover letters from job postings + resume
+4. **Email Assistant** — Professional follow-ups, pitches, and client communication
+5. **Invoice Generator** — Create, manage, and track client invoices
+6. **Client CRM** — Track clients, projects, revenue, and deadlines
+7. **Portfolio Builder** — Publishable portfolio with 11 section types, 10 themes, custom domains
+8. **Analytics Dashboard** — Usage tracking, tool breakdown, weekly activity charts
 
-**Use your preferred IDE**
+## 🏗 Architecture
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```
+src/
+├── components/
+│   ├── dashboard/       # 12 dashboard feature components
+│   ├── landing/         # 15 landing page sections
+│   └── ui/              # 40+ shadcn/ui components
+├── pages/               # 12 route pages
+├── hooks/               # Custom React hooks
+├── integrations/        # Supabase client + auto-generated types
+└── lib/                 # Utilities (PDF export, helpers)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+supabase/
+├── functions/           # 8 Edge Functions (auth, AI, billing, admin)
+├── migrations/          # Database migrations
+└── config.toml          # Supabase project config
+```
 
-Follow these steps:
+## 🗄 Database Schema
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+| Table | Purpose |
+|-------|---------|
+| `profiles` | User profile data |
+| `proposals` | Generated proposals |
+| `cover_letters` | Generated cover letters |
+| `emails` | Generated emails |
+| `mockups` | Generated mockups |
+| `invoices` | Client invoices (items as JSON) |
+| `clients` | CRM client records |
+| `projects` | CRM project tracking |
+| `portfolios` | Published portfolio sites |
+| `templates` | Saved content templates |
+| `subscriptions` | Paddle subscription state |
+| `user_usage` | Usage limits + premium status |
+| `user_roles` | RBAC (admin, moderator, user) |
+| `ip_usage` | Anonymous usage tracking |
+
+All tables have Row-Level Security (RLS) enabled with per-user policies.
+
+## ⚡ Edge Functions
+
+| Function | Purpose |
+|----------|---------|
+| `generate-proposal` | AI proposal generation |
+| `generate-cover-letter` | AI cover letter generation |
+| `generate-email` | AI email drafting |
+| `generate-mockup` | AI mockup generation |
+| `paddle-webhook` | Subscription lifecycle events |
+| `cancel-subscription` | User-initiated cancellation |
+| `check-admin` | Admin role verification |
+| `admin-data` | Admin dashboard data + actions |
+
+## 🔐 Security
+
+- Row-Level Security on all tables
+- RBAC via `user_roles` table + `has_role()` security definer function
+- Admin actions gated behind Edge Function auth checks
+- Paddle webhook signature verification (HMAC-SHA256)
+- Usage limits enforced server-side via database functions
+
+## 💰 Revenue Model
+
+- **Free Tier**: 5 proposals, 5 mockups, 3 cover letters, 5 emails
+- **Pro Plan**: $19/month (or yearly) — unlimited everything via Paddle
+
+## 🧪 Local Development
+
+```bash
+# Clone and install
 git clone <YOUR_GIT_URL>
+cd propel
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Variable | Description |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase anon key |
+| `VITE_SUPABASE_PROJECT_ID` | Supabase project ID |
 
-**Use GitHub Codespaces**
+Edge function secrets (configured in Supabase):
+- `PADDLE_WEBHOOK_SECRET` — Paddle webhook verification
+- AI model API keys (configured via Lovable AI integration)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📄 License
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Proprietary. All rights reserved.
