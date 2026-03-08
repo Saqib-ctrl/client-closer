@@ -17,6 +17,8 @@ import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import About from "./pages/About";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
