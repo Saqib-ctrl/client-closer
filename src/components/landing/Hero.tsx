@@ -11,7 +11,7 @@ const Hero = () => {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/[0.03] rounded-full blur-[100px]" />
       </div>
 
-      <motion.div style={{ opacity, scale }} className="container-narrow text-center relative z-10">
+      <div className="container-narrow text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
