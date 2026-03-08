@@ -1,20 +1,10 @@
 import { ArrowRight, Play } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { motion } from "framer-motion";
 import HeroDashboardPreview from "./HeroDashboardPreview";
 
 const Hero = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"]
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.96]);
-
   return (
-    <section ref={sectionRef} className="relative overflow-hidden pt-28 md:pt-36 lg:pt-44 pb-20 md:pb-28">
+    <section className="relative overflow-hidden pt-28 md:pt-36 lg:pt-44 pb-20 md:pb-28">
       {/* Gradient mesh background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/[0.04] rounded-full blur-[120px]" />
