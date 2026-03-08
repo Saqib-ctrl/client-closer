@@ -3,15 +3,20 @@ import { useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const sampleJobDescription = `Looking for a talented UI/UX designer to redesign our mobile banking app. Need someone with fintech experience who understands user psychology and can create intuitive interfaces.`;
+const sampleJobDescription = `We're looking for an experienced developer to rebuild our outdoor gear e-commerce store. Currently on Shopify but need better performance and lower fees. Must have experience with custom storefronts and payment integrations.`;
 
-const generatedProposal = `Hi! I noticed you're looking to redesign your mobile banking app, and I'm excited about the opportunity.
+const generatedProposal = `Re: E-commerce rebuild for your outdoor gear shop
 
-I specialize in fintech UI/UX design with 5+ years of experience creating intuitive financial interfaces. My recent work includes redesigning a payment app that increased user engagement by 40%.
+I noticed you're looking to migrate from Shopify to a custom solution for better performance and lower fees. I recently helped OutdoorPro do exactly this — they saw a 40% improvement in load times and saved $800/month.
 
-I understand the unique challenges of banking apps — balancing security with usability, building trust through design, and simplifying complex transactions.
+For your project, I'd recommend:
+• Next.js storefront with image optimization for your product photos
+• Headless CMS for your team to manage inventory
+• Stripe integration with lower processing fees
 
-I'd love to discuss your vision and show you some relevant case studies. Available for a quick call this week?`;
+Investment: $4,500 for the complete build (2-3 weeks)
+
+I'd love to walk you through my approach and share the OutdoorPro case study. Available for a quick call this week?`;
 
 const InteractiveDemo = () => {
   const [stage, setStage] = useState<"input" | "processing" | "output">("input");
