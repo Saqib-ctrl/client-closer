@@ -97,6 +97,17 @@
     background-clip: text;
   }
 
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: hsl(var(--card) / 0.6);
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(circle, hsl(var(--border) / 0.4) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
   .card-elevated {
     box-shadow: var(--card-shadow);
     transition: box-shadow 0.3s ease, transform 0.3s ease;
