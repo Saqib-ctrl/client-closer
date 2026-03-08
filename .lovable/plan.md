@@ -1,43 +1,58 @@
 
 
-## Plan: Prepare Propel for Acquire.com Listing
+## Plan: Premium Landing Page Redesign
 
-Selling on Acquire requires making the product look professional, credible, and investor/buyer-ready. Here are the changes needed:
+The current landing page is functional but looks like a standard SaaS template. To achieve a premium, modern, minimalistic feel that impresses Acquire buyers, here's the approach:
 
-### 1. Update Stats & Social Proof to Be Realistic
-- **StatsCounter.tsx**: Update "3 tools" to "8 tools" to match the current product. Review other stats for accuracy.
-- **Hero.tsx**: The "500+ freelancers winning clients" claim needs to either be accurate or softened (e.g., "Join freelancers winning clients").
+### Core Concept
+Replace the current text-heavy hero with a **floating 3D-perspective dashboard mockup** showing live client messages, notifications, and tool activity. Use CSS `perspective` and `transform: rotateX/rotateY` (no heavy 3D libraries) to create an isometric app screen effect with animated content inside it. Keep it lightweight per the user's performance preference.
 
-### 2. Update Footer Copyright Year
-- **Footer.tsx**: Change "© 2025" to "© 2026" (current year).
+### Changes
 
-### 3. Add Acquire-Friendly Pages
-- **Create `/about` page**: A professional "About Propel" page with product story, tech stack overview (React, AI-powered, Paddle payments), team info placeholder, and key metrics. Buyers on Acquire want to understand the business at a glance.
+**1. Hero Section - Complete Redesign (`Hero.tsx`)**
+- Clean, minimal headline with large whitespace — fewer words, more impact
+- Remove the 8 tool pills (cluttered) — move them to a subtle animated ticker below
+- Add a **floating 3D perspective mockup** below the CTA: a CSS-perspective card showing an animated dashboard with:
+  - Incoming client message notifications sliding in
+  - "Proposal sent" / "Invoice paid" status updates
+  - A mini tool switcher bar
+- Subtle gradient mesh background instead of blurry circles
+- Monochrome color palette with primary accent only on key elements
 
-### 4. Polish Landing Page Copy for Buyer Appeal
-- **Solution.tsx, Problem.tsx**: Verify these sections reference all 8 tools (not just original 3). Update if outdated.
-- **FinalCTA.tsx**: Update copy from "Proposals. Mockups. Cover letters." to include the full toolkit.
-- **InteractiveDemo.tsx**: Ensure the demo reflects current capabilities.
-- **Testimonials.tsx**: Review for consistency with current feature set.
+**2. New Animated Dashboard Preview Component (`HeroDashboardPreview.tsx`)**
+- Pure CSS 3D perspective card (rotateX: 12deg, rotateY: -8deg) with a glass-morphism border
+- Inside: animated fake UI showing:
+  - A sidebar with tool icons
+  - A main content area with a "New message from Sarah Chen" notification sliding in
+  - A proposal preview card fading in
+  - Status badges ("Sent", "Viewed", "Paid") animating
+- Uses framer-motion for staggered entry animations
+- Hover: card slightly flattens toward the viewer (reduces rotation)
 
-### 5. Add Business Metrics to Admin Dashboard
-- **Admin.tsx**: Add an MRR estimate card (Pro users x $19), churn indicator, and a simple revenue projection. Buyers want to see business health metrics.
+**3. Refined Section Spacing & Typography**
+- Increase hero vertical padding significantly for breathing room
+- Reduce subtitle text size — let the visual do the talking
+- Use `font-light` for subtitles instead of regular weight
 
-### 6. Code & Documentation Cleanup
-- **README.md**: Rewrite with a professional project overview including tech stack, features list, architecture summary, setup instructions, and environment variables needed. This is critical for Acquire due diligence.
+**4. LogoBar Polish (`LogoBar.tsx`)**
+- Replace emoji icons with subtle monochrome text-only logos
+- Add a slow infinite horizontal scroll/marquee effect
 
-### Summary of Files to Create/Edit
+**5. Subtle Grid/Dot Background (`Index.tsx`)**
+- Add a faint dot grid pattern overlay to the page background for depth
+
+### Files to Create/Edit
 | File | Action |
 |------|--------|
-| `src/components/landing/Footer.tsx` | Update copyright year |
-| `src/components/landing/StatsCounter.tsx` | Update to 8 tools |
-| `src/components/landing/FinalCTA.tsx` | Update copy for full toolkit |
-| `src/components/landing/Hero.tsx` | Soften unverifiable social proof |
-| `src/pages/About.tsx` | Create new page |
-| `src/App.tsx` | Add `/about` route |
-| `src/components/landing/Footer.tsx` | Add About link |
-| `src/pages/Admin.tsx` | Add MRR/revenue metrics |
-| `README.md` | Rewrite for buyer due diligence |
-| `src/components/landing/Solution.tsx` | Verify/update for 8 tools |
-| `src/components/landing/Problem.tsx` | Verify/update if needed |
+| `src/components/landing/Hero.tsx` | Redesign with minimal copy + 3D preview |
+| `src/components/landing/HeroDashboardPreview.tsx` | New floating 3D dashboard mockup |
+| `src/components/landing/LogoBar.tsx` | Marquee scroll + cleaner styling |
+| `src/index.css` | Add dot grid background utility, glass-morphism classes |
+
+### Technical Approach
+- CSS `perspective` + `transform3d` for the 3D card — no external 3D libraries needed
+- `framer-motion` for staggered content animations inside the preview
+- CSS `backdrop-filter: blur()` for glass effect
+- Infinite CSS `@keyframes` marquee for logo bar
+- All lightweight, no performance concerns
 
