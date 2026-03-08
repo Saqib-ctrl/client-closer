@@ -85,7 +85,7 @@ const Hero = () => {
 
         {/* 3D Dashboard Preview */}
         <HeroDashboardPreview />
-      </motion.div>
+      </div>
     </section>
   );
 };
