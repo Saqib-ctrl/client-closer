@@ -52,6 +52,7 @@ const Header = () => {
     { id: "demo", label: "Demo" },
     { id: "example", label: "Example" },
     { id: "pricing", label: "Pricing", href: "/pricing" },
+    { id: "blog", label: "Blog", href: "/blog" },
     { id: "faq", label: "FAQ" }
   ];
 

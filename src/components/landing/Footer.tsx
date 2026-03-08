@@ -11,6 +11,9 @@ const Footer = () => {
           </div>
           
           <nav className="flex items-center gap-6">
+            <a href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Blog
+            </a>
             <a href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               About
             </a>
