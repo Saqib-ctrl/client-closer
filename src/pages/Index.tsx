@@ -20,7 +20,7 @@ import MobileStickyCTA from "@/components/landing/MobileStickyCTA";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative dot-grid">
       <Header />
       <main className="relative z-10">
         <Hero />

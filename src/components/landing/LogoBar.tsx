@@ -1,37 +1,33 @@
 import { motion } from "framer-motion";
 
-const platforms = [
-  { name: "Upwork", icon: "💼" },
-  { name: "Fiverr", icon: "🎯" },
-  { name: "Toptal", icon: "⭐" },
-  { name: "Freelancer", icon: "🚀" },
-  { name: "99designs", icon: "🎨" }
-];
+const platforms = ["Upwork", "Fiverr", "Toptal", "Freelancer", "99designs", "Dribbble", "Behance", "LinkedIn"];
 
 const LogoBar = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.7 }}
-      className="mt-16 pt-16 border-t border-border/50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8, delay: 0.8 }}
+      className="py-12 border-t border-border/30 overflow-hidden"
     >
-      <p className="text-center text-sm text-muted-foreground mb-8">
+      <p className="text-center text-xs uppercase tracking-widest text-muted-foreground/50 mb-8 font-medium">
         Trusted by freelancers on
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-        {platforms.map((platform, index) => (
-          <motion.div
-            key={platform.name}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
-            className="flex items-center gap-2 text-muted-foreground/60 hover:text-muted-foreground transition-colors"
-          >
-            <span className="text-xl">{platform.icon}</span>
-            <span className="font-medium text-sm">{platform.name}</span>
-          </motion.div>
-        ))}
+      <div className="relative">
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
+
+        <div className="flex animate-marquee">
+          {[...platforms, ...platforms].map((name, i) => (
+            <span
+              key={`${name}-${i}`}
+              className="mx-8 md:mx-12 text-muted-foreground/30 text-lg font-semibold tracking-wide whitespace-nowrap select-none"
+            >
+              {name}
+            </span>
+          ))}
+        </div>
       </div>
     </motion.div>
   );
