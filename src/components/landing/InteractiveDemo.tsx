@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { ArrowRight, Sparkles, Edit3 } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const sampleJobDescription = `Looking for a talented UI/UX designer to redesign our mobile banking app. Need someone with fintech experience who understands user psychology and can create intuitive interfaces.`;
@@ -16,13 +16,10 @@ I'd love to discuss your vision and show you some relevant case studies. Availab
 const InteractiveDemo = () => {
   const [stage, setStage] = useState<"input" | "processing" | "output">("input");
   const [typedText, setTypedText] = useState("");
-  const [jobInput, setJobInput] = useState("");
-  const [isUsingCustom, setIsUsingCustom] = useState(false);
   const navigate = useNavigate();
 
   const startDemo = () => {
     setStage("processing");
-    
     setTimeout(() => {
       setStage("output");
       let i = 0;
@@ -40,171 +37,87 @@ const InteractiveDemo = () => {
   const resetDemo = () => {
     setStage("input");
     setTypedText("");
-    setJobInput("");
-    setIsUsingCustom(false);
-  };
-
-  const handleTryOwn = () => {
-    navigate("/auth");
   };
 
   return (
-    <section id="demo" className="section-padding bg-muted/30">
+    <section id="demo" className="py-24 md:py-32 border-t border-border/30">
       <div className="container-wide">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="max-w-2xl mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-            See the magic happen.
+          <p className="text-xs uppercase tracking-widest text-muted-foreground/50 font-medium mb-4">Live demo</p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
+            See it in action.
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Watch how Propel transforms a job description into a winning proposal in seconds.
-          </p>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="max-w-4xl"
         >
-          <div className="bg-card rounded-2xl border border-border/50 overflow-hidden shadow-xl">
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border/50 bg-muted/50">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                </div>
-                <span className="text-xs text-muted-foreground ml-2">propel.app</span>
+          <div className="bg-card rounded-2xl border border-border/30 overflow-hidden">
+            {/* Browser bar */}
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-border/20">
+              <div className="flex gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-border" />
+                <div className="w-2.5 h-2.5 rounded-full bg-border" />
+                <div className="w-2.5 h-2.5 rounded-full bg-border" />
               </div>
-              {stage === "input" && (
-                <motion.button
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  onClick={handleTryOwn}
-                  className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-                >
-                  <Edit3 className="w-3 h-3" />
-                  Try with your own job
-                </motion.button>
-              )}
+              <span className="text-[10px] text-muted-foreground/50 ml-2 font-mono">propel.app</span>
             </div>
 
-            {/* Content */}
             <div className="p-6 md:p-8">
               <AnimatePresence mode="wait">
                 {stage === "input" && (
-                  <motion.div
-                    key="input"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-4"
-                  >
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
-                      <span className="px-2 py-1 rounded bg-primary/10 text-primary text-xs">Step 1</span>
-                      Paste the job description
-                    </div>
-                    <div className="bg-muted/50 rounded-lg p-4 border border-border/50 font-mono text-sm">
+                  <motion.div key="input" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground/50 font-medium">Paste a job description</p>
+                    <div className="bg-muted/30 rounded-lg p-4 border border-border/20 text-sm text-muted-foreground font-mono leading-relaxed">
                       {sampleJobDescription}
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={startDemo}
-                        className="btn-primary flex-1"
-                      >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Generate Proposal
-                      </motion.button>
-                    </div>
+                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={startDemo} className="btn-primary text-sm">
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Generate Proposal
+                    </motion.button>
                   </motion.div>
                 )}
 
                 {stage === "processing" && (
-                  <motion.div
-                    key="processing"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex flex-col items-center justify-center py-12"
-                  >
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent mb-4"
-                    />
-                    <p className="text-foreground font-medium">Analyzing job requirements...</p>
-                    <p className="text-sm text-muted-foreground">Crafting personalized proposal</p>
+                  <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-16">
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-10 h-10 rounded-full border-2 border-primary border-t-transparent mb-4" />
+                    <p className="text-sm font-medium">Analyzing requirements...</p>
+                    <p className="text-xs text-muted-foreground">Crafting personalized proposal</p>
                   </motion.div>
                 )}
 
                 {stage === "output" && (
-                  <motion.div
-                    key="output"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-4"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                        <span className="px-2 py-1 rounded bg-green-500/10 text-green-600 text-xs">Done</span>
-                        Your personalized proposal
-                      </div>
-                      <motion.button
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 2 }}
-                        onClick={resetDemo}
-                        className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        Try again
-                      </motion.button>
+                  <motion.div key="output" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] uppercase tracking-widest text-primary/60 font-medium">Generated proposal</p>
+                      <button onClick={resetDemo} className="text-xs text-muted-foreground/50 hover:text-foreground transition-colors">Reset</button>
                     </div>
-                    <div className="bg-muted/50 rounded-lg p-4 border border-border/50 min-h-[200px]">
-                      <p className="text-sm whitespace-pre-wrap">
+                    <div className="bg-muted/30 rounded-lg p-4 border border-primary/10 min-h-[200px]">
+                      <p className="text-sm whitespace-pre-wrap leading-relaxed">
                         {typedText}
                         {typedText.length < generatedProposal.length && (
-                          <motion.span
-                            animate={{ opacity: [1, 0] }}
-                            transition={{ duration: 0.5, repeat: Infinity }}
-                            className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle"
-                          />
+                          <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.5, repeat: Infinity }} className="inline-block w-0.5 h-4 bg-primary ml-0.5 align-middle" />
                         )}
                       </p>
                     </div>
-                    
-                    {/* CTA after demo completes */}
+
                     {typedText.length === generatedProposal.length && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="pt-4 border-t border-border/50"
-                      >
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                          <p className="text-sm text-muted-foreground">
-                            <span className="text-foreground font-medium">Ready to win more clients?</span> Get 5 free proposals now.
-                          </p>
-                          <motion.a
-                            href="/auth"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="btn-primary group whitespace-nowrap"
-                          >
-                            Start Free
-                            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </motion.a>
-                        </div>
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex items-center justify-between pt-4 border-t border-border/20">
+                        <p className="text-sm text-muted-foreground">Ready to try with your own job?</p>
+                        <motion.a href="/auth" whileHover={{ scale: 1.02 }} className="btn-primary group text-sm">
+                          Start Free
+                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </motion.a>
                       </motion.div>
                     )}
                   </motion.div>
