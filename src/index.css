@@ -132,6 +132,10 @@
 }
 
 @layer components {
+  #lovable-badge {
+    display: none !important;
+  }
+
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5;
   }
