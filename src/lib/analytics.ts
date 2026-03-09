@@ -2,29 +2,14 @@
 declare global {
   interface Window {
     gtag: (...args: any[]) => void;
-    fbq: (...args: any[]) => void;
     dataLayer: any[];
   }
 }
 
 export const trackEvent = (eventName: string, parameters?: Record<string, any>) => {
   try {
-    // Google Analytics 4
     if (window.gtag) {
       window.gtag('event', eventName, parameters);
-    }
-    
-    // Facebook Pixel
-    if (window.fbq) {
-      if (eventName === 'signup') {
-        window.fbq('track', 'CompleteRegistration');
-      } else if (eventName === 'upgrade') {
-        window.fbq('track', 'Subscribe');
-      } else if (eventName === 'purchase') {
-        window.fbq('track', 'Purchase', parameters);
-      } else {
-        window.fbq('trackCustom', eventName, parameters);
-      }
     }
     
     console.log('Analytics event tracked:', eventName, parameters);
