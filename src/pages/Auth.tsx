@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { z } from "zod";
+import { trackSignup, trackButtonClick } from "@/lib/analytics";
 
 const authSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -127,6 +128,8 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
+          // Track successful signup
+          trackSignup('email');
           toast({ title: "Account created!", description: "You can now access your dashboard." });
         }
       }

@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { trackUpgrade, trackButtonClick } from "@/lib/analytics";
 
 declare global {
   interface Window {
@@ -161,6 +162,10 @@ export function usePaddleCheckout({ userId, userEmail }: PaddleCheckoutProps) {
       userEmail,
       planType
     });
+
+    // Track checkout initiation
+    trackButtonClick('upgrade_to_pro', 'checkout');
+    trackUpgrade(planType, planType === 'yearly' ? 180 : 19);
 
     try {
       window.Paddle.Checkout.open({
