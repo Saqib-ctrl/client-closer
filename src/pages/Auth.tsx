@@ -128,6 +128,8 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
+          // Track successful signup
+          trackSignup('email');
           toast({ title: "Account created!", description: "You can now access your dashboard." });
         }
       }
