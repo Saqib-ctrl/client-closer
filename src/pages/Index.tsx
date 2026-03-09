@@ -42,6 +42,8 @@ const Index = () => {
       </main>
       <Footer />
       <MobileStickyCTA />
+      <SocialProofNotifications />
+      <ExitIntentPopup />
     </div>
   );
 };
