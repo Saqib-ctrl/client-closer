@@ -17,6 +17,8 @@ import Trust from "@/components/landing/Trust";
 import FinalCTA from "@/components/landing/FinalCTA";
 import Footer from "@/components/landing/Footer";
 import MobileStickyCTA from "@/components/landing/MobileStickyCTA";
+import { SocialProofNotifications } from "@/components/SocialProofNotifications";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 const Index = () => {
   return (
