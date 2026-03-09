@@ -163,6 +163,10 @@ export function usePaddleCheckout({ userId, userEmail }: PaddleCheckoutProps) {
       planType
     });
 
+    // Track checkout initiation
+    trackButtonClick('upgrade_to_pro', 'checkout');
+    trackUpgrade(planType, planType === 'yearly' ? 180 : 19);
+
     try {
       window.Paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
