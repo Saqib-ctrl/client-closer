@@ -25,7 +25,8 @@ Deno.serve(async (req) => {
     const { data: roleData } = await supabaseClient.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").single();
     if (!roleData) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
-    const { action } = await req.json();
+    const body = await req.json();
+    const { action } = body;
 
     if (action === "get_dashboard") {
       // Get all users from auth
@@ -78,7 +79,6 @@ Deno.serve(async (req) => {
 
 
     if (action === "update_user_premium") {
-      const body = await req.clone().json();
       const { target_user_id, is_premium } = body;
       
       const { error } = await supabaseClient
@@ -91,7 +91,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "update_user_limits") {
-      const body = await req.clone().json();
       const { target_user_id, proposals_limit, mockups_limit, cover_letters_limit, emails_limit } = body;
       
       const { error } = await supabaseClient
@@ -104,7 +103,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "reset_user_usage") {
-      const body = await req.clone().json();
       const { target_user_id } = body;
       
       const { error } = await supabaseClient
@@ -117,7 +115,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_user") {
-      const body = await req.clone().json();
       const { target_user_id } = body;
       
       const { error } = await supabaseClient.auth.admin.deleteUser(target_user_id);
@@ -126,7 +123,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "add_admin_role") {
-      const body = await req.clone().json();
       const { target_user_id } = body;
       
       const { error } = await supabaseClient
@@ -138,7 +134,6 @@ Deno.serve(async (req) => {
     }
 
     if (action === "remove_admin_role") {
-      const body = await req.clone().json();
       const { target_user_id } = body;
       
       const { error } = await supabaseClient
